@@ -3,7 +3,7 @@ const app = express();
 const path =  require("path");
 const ejsMate = require("ejs-mate");
 const cookieParser = require("cookie-parser");
-const authUser = require("./routes/authRoute.js");
+const authRoute = require("./routes/authRoute.js");
 const homeRoute = require("./routes/homeRoute.js")
 const conversationsRoute = require("./routes/conversations.js")
 const messageRoute = require("./routes/messageRoute.js")
@@ -31,9 +31,7 @@ const io =  new Server(server);
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
-app.get('/', (req, res) => {
-    res.redirect('/api/auth/signup');
-});
+
 
 const users = new Map();
 
@@ -107,8 +105,7 @@ async function getConversationMembers(conversationId) {
 }
 
 
-
-app.use("/api/auth", authUser);
+app.use("/", authRoute)
 app.use("/api/home",  homeRoute);
 app.use("/api/conversations",  conversationsRoute);
 app.use("/api/message", messageRoute)
