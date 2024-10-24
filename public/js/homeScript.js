@@ -417,7 +417,6 @@ const ChatManager = {
         document.getElementById('chatMain')?.addEventListener('submit', (e) => {
             if (e.target.id === 'messageForm') {
                 e.preventDefault();
-                console.log("Form submission prevented");
                 this.handleMessageSubmit(e);
             }
         });
@@ -566,7 +565,6 @@ const ChatManager = {
             const response = await axios.get("/api/conversations/friend",{
                 params: { email: inputEmail }
             })
-            console.log(response.data)
             return response.data;
 
         } catch (error) {
@@ -598,7 +596,6 @@ const ChatManager = {
         const content = messageInput.value.trim();
         
         if (!content || !this.currentChatId) {
-            console.log("Cannot send message: no content or no active chat");
             return;
         }
 

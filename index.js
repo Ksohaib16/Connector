@@ -31,7 +31,9 @@ const io =  new Server(server);
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
-
+app.get('/', (req, res) => {
+    res.redirect('/api/auth/login');
+});
 
 const users = new Map();
 
@@ -105,7 +107,7 @@ async function getConversationMembers(conversationId) {
 }
 
 
-app.use("/", authRoute)
+app.use("/api/auth", authRoute)
 app.use("/api/home",  homeRoute);
 app.use("/api/conversations",  conversationsRoute);
 app.use("/api/message", messageRoute)
