@@ -1,0 +1,33 @@
+<% layout("/layouts/boilerplate")  %>
+<input id="currEmail" type="hidden" value="<%= user.email %>">
+<input id="currUserId" type="hidden" value="<%= user.id %>">
+
+
+
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-md-4 chat-sidebar">
+            <div class="sidebar-header">
+                <h2 class="text-left py-3"><%= user.username %></h2>
+                <div class="search-container">
+                    <form id="createConversationForm">
+                        <div class="search-form-div">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search friends...">
+                            <button id="searchButton" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                        </div>
+                    </form>
+                </div>
+                <div id="searchResult">
+                <!-- Search result section -->
+                </div>
+            </div>
+            <!-- Friend list section -->
+            <div class="friend-list" id="friendList">
+            </div>
+        </div>
+
+        <div class="col-md-8 chat-main" id="chatMain">
+            <!-- chat will be added here  -->
+        </div>
+    </div>
+</div>

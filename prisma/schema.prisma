@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int                  @id @default(autoincrement())
+  username         String               @unique
+  email            String               @unique
+  password         String
+  avatarUrl        String?
+  status           UserStatus           @default(OFFLINE)
+  lastSeen         DateTime?
+  createdAt        DateTime             @default(now())
+  lastLogin        DateTime?
+  friends          Friend[]             @relation("UserFriends")
+  friendOf         Friend[]             @relation("FriendToUser")
+  createdGroups    Group[]              @relation("GroupCreator")
+  groupMemberships GroupMember[]
+  conversations    ConversationMember[]
+  sentMessages     Message[]            @relation("SentMessages")
+  settings         UserSettings?
+}
+
+model UserSettings {
+  id            Int     @id @default(autoincrement())
+  userId        Int     @unique
+  theme         String  @default("light")
+  notifications Boolean @default(true)
+  language      String  @default("en")
+  user          User    @relation(fields: [userId], references: [id])
+}
+
+model Conversation {
+  id           String               @id @default(cuid())
+  members      ConversationMember[]
+  messages     Message[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model Message {
+  id             Int                 @id @default(autoincrement())
+  conversationId String
+  senderId       Int
+  content        String
+  messageType    MessageType         @default(TEXT)
+  status         MessageStatus       @default(SENT)
+  timestamp      DateTime            @default(now())
+  media          Media[]
+  conversation   Conversation        @relation(fields: [conversationId], references: [id])
+  sender         User                @relation("SentMessages", fields: [senderId], references: [id])
+  translation    MessageTranslation?
+}
+  
+model Media {
+  id        Int       @id @default(autoincrement())
+  messageId Int
+  mediaUrl  String
+  mediaType MediaType
+  size      Int
+  duration  Int?
+  message   Message   @relation(fields: [messageId], references: [id])
+}
+
+model MessageTranslation {
+  id           Int     @id @default(autoincrement())
+  messageId    Int     @unique
+  translations Json
+  message      Message @relation(fields: [messageId], references: [id])
+}
+
+model Group {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String?
+  avatarUrl   String?
+  createdAt   DateTime      @default(now())
+  createdById Int
+  createdBy   User          @relation("GroupCreator", fields: [createdById], references: [id])
+  members     GroupMember[]
+}
+
+model GroupMember {
+  id       Int             @id @default(autoincrement())
+  groupId  Int
+  userId   Int
+  role     GroupMemberRole @default(MEMBER)
+  joinedAt DateTime        @default(now())
+  group    Group           @relation(fields: [groupId], references: [id])
+  user     User            @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model ConversationMember {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  conversationId String
+  user           User         @relation(fields: [userId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@unique([userId, conversationId])
+}
+
+model Friend {
+  id        Int          @id @default(autoincrement())
+  user      User         @relation("UserFriends", fields: [userId], references: [id])
+  userId    Int
+  friend    User         @relation("FriendToUser", fields: [friendId], references: [id])
+  friendId  Int
+  status    FriendStatus @default(UNBLOCKED)
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, friendId])
+}
+
+enum UserStatus {
+  ONLINE
+  OFFLINE
+  AWAY
+}
+
+enum MessageType {
+  TEXT
+  MEDIA
+  VOICE
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  VOICE
+}
+
+enum FriendStatus {
+  UNBLOCKED
+  BLOCKED
+}
+
+enum GroupMemberRole {
+  ADMIN
+  MEMBER
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
