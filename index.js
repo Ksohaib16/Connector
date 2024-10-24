@@ -31,6 +31,9 @@ const io =  new Server(server);
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
+app.get('/', (req, res) => {
+    res.redirect('/api/auth/signup');
+});
 
 const users = new Map();
 
