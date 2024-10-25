@@ -1,33 +1,62 @@
-<% layout("/layouts/boilerplate")  %>
+<!-- home.ejs -->
+<% layout("/layouts/boilerplate") %>
+
+<!-- Hidden inputs for user data -->
 <input id="currEmail" type="hidden" value="<%= user.email %>">
 <input id="currUserId" type="hidden" value="<%= user.id %>">
 
-
-
+<!-- Main chat container -->
 <div class="container-fluid h-100">
     <div class="row h-100">
+        <!-- Sidebar section -->
         <div class="col-md-4 chat-sidebar">
+            <!-- User profile and search header -->
             <div class="sidebar-header">
-                <h2 class="text-left py-3"><%= user.username %></h2>
+                <div class="user-profile d-flex align-items-center gap-3 mb-3">
+                    <div class="user-avatar">
+                        <!-- Placeholder for user avatar -->
+                        <i class="fas fa-user-circle fa-2x"></i>
+                    </div>
+                    <h2 class="mb-0"><%= user.username %></h2>
+                </div>
+                
+                <!-- Search form -->
                 <div class="search-container">
                     <form id="createConversationForm">
                         <div class="search-form-div">
-                            <input type="text" id="searchInput" class="form-control" placeholder="Search friends...">
-                            <button id="searchButton" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                class="form-control" 
+                                placeholder="Search by email..."
+                                autocomplete="off"
+                            >
+                            <button id="searchButton" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
                     </form>
                 </div>
-                <div id="searchResult">
-                <!-- Search result section -->
+                
+                <!-- Search results container -->
+                <div id="searchResult" class="mt-2">
+                    <!-- Search results will be dynamically added here -->
                 </div>
             </div>
-            <!-- Friend list section -->
+            
+            <!-- Friends list container -->
             <div class="friend-list" id="friendList">
+                <!-- Friends will be dynamically added here -->
             </div>
         </div>
 
+        <!-- Main chat area -->
         <div class="col-md-8 chat-main" id="chatMain">
-            <!-- chat will be added here  -->
+            <!-- Chat content will be dynamically added here -->
         </div>
     </div>
 </div>
+
+<!-- Theme toggle button will be injected by JavaScript -->
+
+<!-- Add these script tags before closing body tag -->

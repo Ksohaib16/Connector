@@ -1,4 +1,5 @@
 const prisma = require("../db/db");
+require('dotenv').config();
 const { userSchema, loginSchema } = require("../schemaValidation");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -27,8 +28,10 @@ module.exports.signup = async (req, res) => {
   let token = jwt.sign({ userId }, JWT_SECRET);
 
   res.cookie("token", token, {
-    httpOnly: false,
-    maxAge: 72 * 60 * 60 * 1000, // 72 hours
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 48 * 60 * 60 * 1000, // 72 hours
   });
 
   res.redirect("/api/home");
@@ -58,8 +61,10 @@ module.exports.login = async (req, res) => {
     JWT_SECRET
   );
   res.cookie("token", token, {
-    httpOnly: false,
-    maxAge: 30 * 24 * 60 * 60 * 1000, //72 hours
+    httpOnly: true,
+       secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    maxAge: 48 * 60 * 60 * 1000, //72 hours
   });
 
   res.redirect("/api/home");

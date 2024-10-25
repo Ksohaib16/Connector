@@ -403,7 +403,7 @@ const ChatManager = {
             if (!conversationElement.querySelector('.notification-badge')) {
                 const badge = document.createElement('div');
                 badge.className = 'notification-badge';
-                badge.innerHTML = '•';
+                badge.innerHTML = 'Message';
                 conversationElement.appendChild(badge);
             }
             
@@ -501,7 +501,7 @@ const ChatManager = {
 
     generateChatHTML(messages) {
         return `
-            <div class="chat-header">
+            <div class="chat-header" id="chatHeader">
                 <div class="chat-header-info">
                     <div class="img"></div>
                     <h3 id="currentChatName">${this.selectedConversationUserName}</h3>
