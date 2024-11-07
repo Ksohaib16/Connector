@@ -3,6 +3,8 @@ require('dotenv').config();
 const { userSchema, loginSchema } = require("../schemaValidation");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
+const bcrypt = require('bcrypt');
+
 
 module.exports.renderSignup = (req, res) => {
   res.render("auth/signup.ejs");
@@ -21,14 +23,27 @@ module.exports.signup = async (req, res) => {
   if (existingUser) {
     return res.status(400).send("Email already exists");
   }
-  let user = await prisma.user.create({
-    data: req.body
-});
+  const password = req.body.password;
+  const username = req.body.username;
+  const email = req.body.email;
+  const avatarUrl = "https://via.placeholder.com/150"
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      username,
+      email,
+      password: hashedPassword,
+      avatarUrl
+      }
+      });
+      
   let userId = user.id;
   let token = jwt.sign({ userId }, JWT_SECRET);
 
   res.cookie("token", token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 48 * 60 * 60 * 1000, // 72 hours
@@ -46,26 +61,37 @@ module.exports.login = async (req, res) => {
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }
+try {
+  let inputPassword = req.body.password;
+
+  async function verifyPassword (inputPassword,  hashedPassword) {
+   return await bcrypt.compare(inputPassword, hashedPassword);
+  };
 
   const user = await prisma.user.findUnique({
-    where: { email: req.body.email, password: req.body.password },
+    where: { email: req.body.email},
   });
-  if (!user) {
-    return res.status(400).json({ error: "Invalid email or password" });
+
+  if(user && await verifyPassword(inputPassword, user.password)){
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      JWT_SECRET
+    );
+    res.cookie("token", token, {
+      httpOnly: false,
+         secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+      maxAge: 48 * 60 * 60 * 1000, //72 hours
+    });
+  
+    res.redirect("/api/home");
+  }else{
+    res.status(401).json({ error: "Invalid email or password" });
   }
-
-  const token = jwt.sign(
-    {
-      userId: user.id,
-    },
-    JWT_SECRET
-  );
-  res.cookie("token", token, {
-    httpOnly: true,
-       secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-    maxAge: 48 * 60 * 60 * 1000, //72 hours
-  });
-
-  res.redirect("/api/home");
+ 
+} catch (error) {
+  
+}  
 };

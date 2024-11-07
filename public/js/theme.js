@@ -1,6 +1,5 @@
 class ThemeManager {
     constructor() {
-        // Use localStorage instead of cookies
         this.currentTheme = this.getThemeFromStorage() || 'light';
         this.initializeTheme();
         this.attachEventListeners();

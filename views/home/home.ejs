@@ -7,17 +7,73 @@
 
 <!-- Main chat container -->
 <div class="container-fluid h-100">
+
+    <div id="slideOverlay" class="slide-overlay">
+        <div class="overlay-header d-flex align-items-center">
+            <h3>Menu</h3>
+            <span class="close-overlay">&times;</span>
+        </div>
+        <div class="overlay-content">
+            <ul class="menu-list">
+                <li><i class="fas fa-user"></i> Profile</li>
+                <li id="clearChat"><i class="fas fa-trash"></i> Clear Chat</li>
+                <li id="translationSetting"><i class="fas fa-redo"></i>Translatiion Setting</li>
+            </ul>
+        </div>
+    </div>
+    <div id="profileOverlay" class="profile-overlay">
+        <div class="profile-overlay-header d-flex align-items-center">
+            <h3>Menu</h3>
+            <span class="profile-close-overlay">&times;</span>
+
+        </div>
+        <div class="profile-overlay-content">
+            <ul class="profile-list">
+                <li id="yourProfile"><i class="fas fa-user"></i>Your Profile</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Translatiion Preferences</h2>
+                <span class="close">&times;</span>
+            </div>
+            
+            <Label for="userChoice">Your Language</Label>
+            <select id="userChoice" class="form-select">
+                <option value="autodetect">Auto Detect</option>
+                <option value="english">English</option>
+                <option value="hinglish">Hinglish</option>
+                <option value="hindi">hindi</option>
+            </select>
+
+            <label for="targetLanguage">Translate To</label>
+            <select id="targetLanguage" class="form-select">
+                
+                <option value="">Select Language</option>
+                <option value="english">English</option>
+                <option value="hindi">Hindi</option>
+            </select>
+
+            <button id="saveSelections" class="save-btn">Save Preferences</button>
+        </div>
+    </div>
+
     <div class="row h-100">
         <!-- Sidebar section -->
         <div class="col-md-4 chat-sidebar">
             <!-- User profile and search header -->
             <div class="sidebar-header">
-                <div class="user-profile d-flex align-items-center gap-3 mb-3">
+                <div class="user-profileprof d-flex align-items-center gap-3 mb-3">
                     <div class="user-avatar">
-                        <!-- Placeholder for user avatar -->
-                        <i class="fas fa-user-circle fa-2x"></i>
+                        <div class="">
+                        <img src="<%= user.avatarUrl %>" alt="" class="profilePicture">
+                        </div>
                     </div>
                     <h2 class="mb-0"><%= user.username %></h2>
+                <div class="profile-setting" id="profileSetting"> <i class="fa-solid fa-ellipsis-vertical"></i> </div>
                 </div>
                 
                 <!-- Search form -->
@@ -38,25 +94,20 @@
                     </form>
                 </div>
                 
-                <!-- Search results container -->
                 <div id="searchResult" class="mt-2">
                     <!-- Search results will be dynamically added here -->
                 </div>
             </div>
             
-            <!-- Friends list container -->
             <div class="friend-list" id="friendList">
                 <!-- Friends will be dynamically added here -->
             </div>
         </div>
 
-        <!-- Main chat area -->
         <div class="col-md-8 chat-main" id="chatMain">
             <!-- Chat content will be dynamically added here -->
         </div>
     </div>
+    <div id="statusDisplay" class="status-display alert"></div>
 </div>
-
-<!-- Theme toggle button will be injected by JavaScript -->
-
-<!-- Add these script tags before closing body tag -->
+<script src="/js/homeScript.js"></script>

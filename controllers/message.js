@@ -48,87 +48,22 @@ module.exports.create = [authMiddleware,async (req, res) => {
 
 }]
 
-// module.exports.displayMessage = [
-//   authMiddleware,
-//   async (req, res) => {
-//     try {
-//       const currentUserId = req.userId; 
-//       const { friendId } = req.query;
+module.exports.delete = async (req, res)=>{
+    try {
+        let {conversationId} = req.query;
 
-//       if (!friendId) {
-//         return res.status(400).json({ error: 'Friend ID is required' });
-//       }
+        if(conversationId){
+        await prisma.message.deleteMany({where:{
+            conversationId: conversationId
+        }
+        });
+        return res.status(200).json({ message: "Messages deleted successfully" });
+    }else{
+            return res.status(400).json({message: "Conversation ID is required"});
+        }
+        
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-//       const messages = await prisma.message.findMany({
-//         where: {
-//           OR: [
-//             { AND: [{ senderId: currentUserId }, { receiverId: parseInt(friendId) }] },
-//             { AND: [{ senderId: parseInt(friendId) }, { receiverId: currentUserId }] }
-//           ]
-//         },
-//         orderBy: {
-//           timestamp: 'asc'
-//         },
-//         select: {
-//           id: true,
-//           content: true,
-//           senderId: true,
-//           receiverId: true,
-//           timestamp: true,
-//           messageType: true
-//         }
-//       });
-
-//       if (messages.length === 0) {
-//         return res.status(200).json({ message: "No messages found between you and the selected friend." });
-//       }
-      
-
-//       res.json({ messages: "Here are your messages", data: messages });
-
-//     } catch (error) {
-//       console.error('Error fetching messages:', error);
-//       res.status(500).json({ error: 'Internal server error' });
-//     }
-//   }
-// ];
-
-// module.exports.createMessage = async (req, res) => {
-//   let { senderId, receiverId, content, messageType } = req.body;
-
-//   // Convert senderId and receiverId to integers
-//   senderId = parseInt(senderId);
-//   receiverId = parseInt(receiverId);
-
-//   // Validate that the conversion was successful
-//   if (isNaN(senderId) || isNaN(receiverId)) {
-//     return res.status(400).json({ error: 'Invalid sender or receiver ID' });
-//   }
-
-//   try {
-//     console.log('Attempting to create message with data:', { senderId, receiverId, content, messageType });
-    
-//     const message = await prisma.message.create({
-//       data: {
-//         content,
-//         messageType,
-//         sender: { connect: { id: senderId } },
-//         receiver: { connect: { id: receiverId } },
-//       },
-//       include: {
-//         sender: true,
-//         receiver: true,
-//       },
-//     });
-
-//     console.log('Message created successfully:', message);
-//     res.json({ message: "Message created", data: message });
-//   } catch (error) {
-//     console.error('Error creating message:', error);
-//     console.error('Error details:', error.message);
-//     if (error.code) {
-//       console.error('Prisma error code:', error.code);
-//     }
-//     res.status(500).json({ error: 'Failed to create message', details: error.message });
-//   }
-// };

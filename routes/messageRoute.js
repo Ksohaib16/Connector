@@ -9,6 +9,9 @@ router.route("/").post(messageController.create)
 //getall
 router.route("/messages").get(messageController.getMessages);
 
+//delete
+router.route("/delete").delete(messageController.delete);
+
 
 
 module.exports = router;

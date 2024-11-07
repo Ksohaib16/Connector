@@ -1,510 +1,333 @@
 
-// $(document).ready(() => {
-//   const token = document.cookie.split("=")[1];
-//   const socket = io({
-//     auth: { token },
-//   });
-
-//   const currEmail = $("#currEmail").val();
-//   const currentUserId = $("#currUserId").val(); 
-
-//   const searchBtn = document.getElementById("searchButton");
-//   const searchInput = document.getElementById("searchInput");
-//   const friendList = document.getElementById("friendList");
-//   const searchForm = document.getElementById("searchForm");
-  
-    // searchForm.addEventListener("submit", async (e) => {
-    //   e.preventDefault();
-  
-    //   let email = searchInput.value;
-  
-    //   let result = await axios.get(
-    //     `/api/home/search?email=${encodeURIComponent(email)}`
-    //   );
-  
-    //   if (result.data && result.data.username) {
-    //     if (result.data.email === "" || result.data.email === currEmail) {
-    //       console.log("Please enter a valid email address"); //checker
-    //     } else {
-    //       // Display the search result and add friend button
-    //       const searchResultHtml = `
-    //         <div class="search-result">
-    //           <span>${result.data.username}</span>
-    //           <button class="addFriend btn btn-primary" data-friend-id="${result.data.id}">Add Friend</button>
-    //         </div>
-    //       `;
-    //       $("#searchResult").html(searchResultHtml);
-    //     }
-    //   } else {
-    //     $("#searchResult").html("<p>No user found with that email.</p>");
-    //   }
-    //   console.log(result.data);
-    // });
-  
-//     $(document).on("click", ".addFriend", async function(e) {
-//       e.preventDefault();
-//       const friendId = $(this).data("friendId");
-//       try {
-//         let newFriendResult = await axios.post("/api/home/new", {
-//           friendId: friendId,
-//         });
-//         console.log("new friend added:", newFriendResult);
-        
-//         // Refresh the friend list
-//         await refreshFriendList();
-        
-//         // Clear the search result
-//         $("#searchResult").empty();
-//         $("#searchInput").val("");
-//       } catch (error) {
-//         console.error("Error adding friend:", error);
-//       }
-//     });
-  
-//     async function refreshFriendList() {
-//       try {
-//         const response = await axios.get('/api/home/friends');
-//         const friends = response.data.friends;
-        
-//         $('#friendList').empty();
-//         friends.forEach(friendship => {
-//           const friendHtml = `
-//             <div class="friend" id="friend-${friendship.friend.id}" data-friend-id="${friendship.friend.id}">
-//               <div class="img"></div>
-//               <span class="friendUsername">${friendship.friend.username}</span>
-//               <button class="deleteFriend" data-friend-id="${friendship.friend.id}">Delete</button>
-//             </div>
-//           `;
-//           $('#friendList').append(friendHtml);
-//         });
-//       } catch (error) {
-//         console.error("Error refreshing friend list:", error);
-//       }
-//     }
-
-//   async function fetchAndDisplayMessages(friendId) {
-//     try {
-//       console.log("Fetching messages for friend ID:", friendId);
-//       const response = await axios.get(`/api/message/messages?friendId=${friendId}`);
-//       const messages = response.data.data; 
-  
-//       console.log("Fetched messages:", messages);
-  
-//       $("#chatBox").empty();  // Clear the chat box
-//       console.log("Cleared chat box");
-  
-//       // Append messages to the chat box
-//       messages.forEach((message) => {
-//         const isOwnMessage = message.senderId === currentUserId;
-//         const messageHtml = `<p class="${isOwnMessage ? "user-message" : "friend-message"}">${message.content}</p>`;
-//         $("#chatBox").append(messageHtml);
-//       });
-  
-//       console.log("Appended all messages to chat box");
-  
-//       // Scroll to the bottom of the chat box to show the latest messages
-//       $("#chatBox").scrollTop($("#chatBox")[0].scrollHeight);
-//       console.log("Scrolled to bottom of chat box");
-  
-//     } catch (error) {
-//       console.error("Error fetching messages:", error);
-//     }
-//   }
-
-//     async function deleteFriend(friendId) {
-//       try {
-//         await axios.delete(`/api/home/deleteFriend?friendId=${friendId}`);
-//         // Remove the friend element from the DOM
-//         $(`#friend-${friendId}`).remove();
-//       } catch (err) {
-//         console.error("Error deleting friend:", err);
-//       }
-//     }
-  
-//     $(document).on("click", ".deleteFriend", async function (e) {
-//       e.preventDefault();
-//       e.stopPropagation(); // Prevent triggering the openChat event
-//       const friendId = $(this).data("friendId");
-//       await deleteFriend(friendId);
-//     });
-
-//     $(document).on("click", ".friend", async function (e) {
-//       if (!$(e.target).hasClass('deleteFriend')) {
-//         e.preventDefault();
-//         const friendUsername = $(this).find(".friendUsername").text();
-//         const friendId = $(this).data("friendId");
-        
-//         currentChatFriendId = friendId;
-    
-//         $("#currentChatName").text(friendUsername);
-  
-//         // Fetching and display messages
-//         await fetchAndDisplayMessages(friendId);
-  
-//         // Clear notification
-//         $(this).removeClass('new-message-notification');
-        
-//         console.log("Cleared notifications for friend:", friendId);
-//       }
-//     });
-  
-//     function appendMessageToChat(data, isOwnMessage) {
-//       const messageHtml = `<p class="${isOwnMessage ? "user-message" : "friend-message"}">${data.content}</p>`;
-//       $("#chatBox").append(messageHtml);
-//       $("#chatBox").scrollTop($("#chatBox")[0].scrollHeight);
-//     }
-  
-//     $("#chatForm").submit(async (e) => {
-//       e.preventDefault();
-//       const content = $("#messageInput").val().trim();
-    
-//       if (!currentChatFriendId || !content) {
-//         console.error("No chat selected or empty message");
-//         return;
-//       }
-    
-//       try {
-//         console.log("Sending message:", content);
-    
-//         // Sending msg to the server
-//         const response = await axios.post("/api/message", {
-//           senderId: currentUserId,
-//           receiverId: currentChatFriendId,
-//           content: content,
-//           messageType: "TEXT",
-//         });
-    
-//         // Emiting msg
-//         socket.emit("newMessage", response.data);
-    
-//         $("#messageInput").val("");
-    
-//       } catch (error) {
-//         console.error("Error sending message:", error);
-//       }
- 
-//     socket.on("newMessage", async (data) => {
-//       console.log("New message received:", data);
-      
-//       if (data.senderId === currentChatFriendId || data.receiverId === currentUserId) {
-//         const isOwnMessage = data.senderId === currentUserId;
-//         appendMessageToChat(data, isOwnMessage);
-//       } else {
-//         // If the chat is not currently open, show a notification
-//         const friendElement = $(`#friend-${data.senderId}`);
-//         if (friendElement.length > 0) {
-//           friendElement.addClass('new-message-notification');
-//         }
-//       }
-//     });
-  
-
-//     });
-
-
-
-// $("#chatForm").submit((e) => {
-//   e.preventDefault();
-//   const content = $("#messageInput").val().trim();
-
-
-  
-//   if (!content) {
-//     alert("Please enter a message");
-//     return; // Exit the function to avoid sending empty messages
-//   }
-
-//   try {
-//     console.log("Sending message:", content);
-//     socket.emit("newMsg", content);
-
-//     $("#messageInput").val("");
-
-//   } catch (err) {
-//     console.error("Error sending message:", err);
-//   }
-// });
-
-// // Socket Event Handler for New Message
-// socket.on("newMsg", (data) => {
-//   console.log("New message received:", data);
-  
-//   // Construct message bubble based on received data
-//   let receivedMessageBubble = `<div><span>${data}</span></div>`;
-//   $("#chatBox").append(receivedMessageBubble);
-// });
-
-// });
-
-
-// let conversations = [];
-// let currUserId =  $("#currUserId").val();
-// let currConversation = null;
-// let messages = [];
-
-
-
-
-// async function fetchConversations (){
-//     try{
-//         const response =  await axios.get("/api/conversations");
-//         conversations = response.data
-//         displayConversations();
-//     }catch(err){
-//         console.error(err);
-//     }
-// }
-
-// async function displayConversations() {
-//     $("#friendList").empty();
-//     for(let c of conversations) {
-//         for(let member of c.members) {
-//             if (String(member.user.id) !== String(currUserId)) {
-//                 const conversation = `<div class="friend" data-conversation-id="${member.conversationId}">
-//                                         <div class="img"></div>
-//                                         <span>${member.user.username}</span>
-//                                       </div>`;
-//                 $("#friendList").append(conversation);
-//             }
-//         }
-//     }
-
-// };
-// $("#friendList").on("click", ".friend", async function() {
-//     console.log("Clicked Element:", this); // Log the clicked element
-//     const conversationId = $(this).data("conversation-id");
-//     console.log("Conversation ID:", conversationId); 
-//     await selectConversation(conversationId);
-// });
-
-// async function initialChatWindow(currConversation) {
-//     if(currConversation ==  null) {
-//         let chatWindow = `<div class="noConversation col-12 col-md-8"><span>Open a conversation to start chat</span></div>`
-//         $("#chatMain").append(chatWindow);
-//     }
-    
-// }
-
-// async function selectConversation(conversationId){
-//     currConversation = conversationId;
-//     await  fetchMessages(currConversation);
-
-// }
-
-// async function fetchMessages (currConversation){
-//     try{
-//         let  response = await axios.get(`/api/message/messages?conversationId=${currConversation}`)
-//         let messages = response.data;
-//         await displayMessages(messages);
-//     }catch(err){
-//         console.error(err);
-//     }
-// }
-
-// async function displayMessages(messages){
-//     $("#chatMain").empty();
-
-//     for(let  message of messages) {
-//         const userMessage = message.senderId ===  currUserId;
-
-//         let chatWindow = `<div class="chat-header">
-//                 <h3 id="currentChatName">Friend Name</h3>
-//             </div>
-//             <div class="chat-box border p-3 mb-3" style="height: 200px; overflow-y: auto;" id="chatBox">
-//                 <div class="${userMessage ? "user-message" : "other-message"}">${message.content}</div>
-//             </div>
-//             <div class="chat-input">
-//                 <form id="chatForm">
-//                     <div class="input-group">
-//                         <input type="text" id="messageInput" class="form-control" placeholder="Type a message...">
-//                         <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i></button>
-//                     </div>
-//                 </form>
-//             </div>`
-
-//             $("#chatMain").append(chatWindow);
-//     }
-
-// }
-
-
-// async function initChat() {
-//     await fetchConversations();
-//     await initialChatWindow(currConversation);
-//   }
-
-//   window.onload = initChat;
-
-// Chat functionality
-
-
-
 const ChatManager = {
-    currentUserId: null,
-    currentChatId: null,
-    selectedConversationUserName: null,
-    conversations: [],
-    messages: [],
-    socket: null,
 
-    // setup function, this will run when page load
-    start() {
-        this.currentUserId = document.getElementById('currUserId').value;
-        this.attachEventListeners();
-        this.fetchConversations();
-        this.initialChatWindow();
-        this.intializeSocket();
-    },
 
-    intializeSocket(){
-        const token = document.cookie.split("=")[1];
-        this.socket = io({
-            auth : { token}
-        })
+   currentUserId: null,
+   currentChatId: null,
+   selectedConversationUserName: null,
+   selectedConversationUserAvatar: null,
+   conversations: [],
+   messages: [],
+   socket: null,
 
-        // Socket event listeners
-        this.socket.on("newMessage", (data) => {
-            this.handleIncomingMessage(data);
-        });
+   // setup function, this will run when page load
+   start() {
+      this.currentUserId = document.getElementById('currUserId').value;
+      this.attachEventListeners();
+      this.fetchConversations();
+      this.initialChatWindow();
+      this.intializeSocket();
+   },
 
-        // this.socket.on("userTyping", (data) => {
-        //     this.handleUserTyping(data);
-        // });
+   intializeSocket() {
+      const token = document.cookie.split('=')[1];
+      this.socket = io({
+         auth: { token }
+      });
 
-        // this.socket.on("userStopTyping", (data) => {
-        //     this.handleUserStopTyping(data);
-        // });
-    },
+      this.socket.on('connect', () => {
+         console.log('Socket connected:', this.socket.id); // Ensure the client is connected
+      });
 
-    async handleIncomingMessage(data) {
-        const { conversationId, content, senderId } = data;
-        
-        // If message is for current chat, append it
-        if (conversationId === this.currentChatId) {
-            const messageHTML = `
-                <div class="message ${senderId === this.currentUserId ? 'user-message' : 'other-message'}">
-                    ${content}
-                </div>
-            `;
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.insertAdjacentHTML('beforeend', messageHTML);
-            this.scrollToBottom();
-        } else {
-            // Show notification for other conversations
-            this.showMessageNotification(conversationId);
-        }
-    },
+      this.socket.on('newMessage', data => {
+         this.handleIncomingMessage(data);
+      });
+   },
 
-    showMessageNotification(conversationId) {
-        // Find the conversation element
-        const conversationElement = document.querySelector(`.friend[data-conversation-id="${conversationId}"]`);
-        if (conversationElement) {
-            // Add notification indicator
-            if (!conversationElement.querySelector('.notification-badge')) {
-                const badge = document.createElement('div');
-                badge.className = 'notification-badge';
-                badge.innerHTML = 'Message';
-                conversationElement.appendChild(badge);
+   async handleIncomingMessage(data) {
+      const { conversationId, time, content, senderId, messageId } = data;
+
+      // If message is for current chat, append it
+      if (conversationId === this.currentChatId) {
+         const messageHTML = this.MessageHTML(content, senderId, time, messageId);
+         const messageContainer = document.getElementById('messageContainer');
+         messageContainer.insertAdjacentHTML('beforeend', messageHTML);
+         this.scrollToBottom();
+      } else {
+         // Show notification for other conversations
+         this.showMessageNotification(conversationId);
+      }
+   },
+
+   showMessageNotification(conversationId) {
+      // Find the conversation element
+      const conversationElement = document.querySelector(
+         `.friend[data-conversation-id="${conversationId}"]`
+      );
+      if (conversationElement) {
+         // Add notification indicator
+         if (!conversationElement.querySelector('.notification-badge')) {
+            const badge = document.createElement('div');
+            badge.className = 'notification-badge';
+            badge.innerHTML = 'Message';
+            conversationElement.appendChild(badge);
+         }
+
+         // Add notification class for styling
+         conversationElement.classList.add('has-notification');
+      }
+   },
+
+   attachEventListeners() {
+      document.getElementById('profileSetting')?.addEventListener("click", () => {
+         this.openProfileSetting();
+      });
+
+      document.querySelector('.profile-close-overlay').addEventListener('click', () => {
+         console.log('close button clicked');
+         this.closeProfileSetting();
+      });
+
+      document.getElementById('chatMain')?.addEventListener('submit', e => {
+         if (e.target.id === 'messageForm') {
+            e.preventDefault();
+            const clickedButton = e.submitter;
+
+            if (clickedButton.value === 'send') {
+               this.handleMessageSubmit(e);
+            } else if (clickedButton.value === 'translate') {
+               this.handleTranslateButton(e);
             }
-            
-            // Add notification class for styling
-            conversationElement.classList.add('has-notification');
-        }
-    },
+         }
+      });
 
+      // chat setting listener
+      document.getElementById('chatMain').addEventListener('click', e => {
+         if (
+            e.target.id === 'chatSetting' ||
+            (e.target.closest('#chatSetting') && e.target.tagName === 'I')
+         ) {
+            this.toggleChatSetting();
 
-    attachEventListeners() {
-        document.getElementById('chatMain')?.addEventListener('submit', (e) => {
-            if (e.target.id === 'messageForm') {
-                e.preventDefault();
-                this.handleMessageSubmit(e);
+            //quick translate
+         } else if (e.target.id === 'quickTranslate') {
+            console.log(e.target.id, 'quick translaion event');
+            const content = e.target.dataset.content;
+            const messageId = e.target.dataset.id;
+            const messageDiv = e.target.closest('.message');
+            this.quickTranslate(content, messageId, messageDiv);
+         }
+      });
+
+      document.querySelector('.close-overlay').addEventListener('click', () => {
+         console.log('close button clicked');
+         this.closeOverlaySetting();
+      });
+
+      document
+         .getElementById('createConversationForm')
+         ?.addEventListener('submit', e => this.createConversation(e));
+
+      document.getElementById('friendList')?.addEventListener('click', e => {
+         if (e.target.closest('.friend')) {
+            const conversationId = e.target.closest('.friend').dataset.conversationId;
+
+            if (this.currentChatId === conversationId) {
+               let selectedDiv = document.querySelector(`[data-conversation="${conversationId}"]`);
+               if (selectedDiv) {
+                  selectedDiv.style.pointerEvents = 'none';
+               }
+            } else {
+               const conversationUsername =
+                  e.target.closest('.friend').dataset.conversationUsername;
+                  const conversationAvatar = e.target.closest(".friend").dataset.conversationAvatar
+               this.selectConversation(conversationId, conversationUsername, conversationAvatar);
             }
-        });
-            document.getElementById("createConversationForm")?.addEventListener("submit", (e) => this.createConversation(e));
-            document.getElementById('friendList')?.addEventListener('click', (e) => {
-            if (e.target.closest('.friend')) {
-                const conversationId = e.target.closest('.friend').dataset.conversationId;
-                const conversationUsername = e.target.closest('.friend').dataset.conversationUsername;
-                this.selectConversation(conversationId, conversationUsername);
+         }
+      });
 
-            }
-        });
-    },
+      // saving language setting
+      document.querySelector('#settingsModal').addEventListener('click', e => {
+         if (e.target.id === 'saveSelections') {
+            this.saveLanguageSelections();
+            popupManager.hideTranslationSetting();
+            popupManager.showStatus('Language settings saved successfully!');
+         }
+      });
 
-    async fetchConversations() {
-        try {
-            const response = await axios.get("/api/conversations");
-            this.conversations = response.data;
-            this.displayConversations();
-        } catch (err) {
-            console.error('Error fetching conversations:', err);
-        }
-    },
+      window.addEventListener('click', e => {
+         if (e.target.id === 'chatSetting' || (!e.target.closest('#slideOverlay') && !e.target.closest('#chatSetting'))
+         ) {
+            this.closeOverlaySetting();
+         }
+         if(e.target.id === "profileSetting" || (!e.target.closest('#profileOverlay') && !e.target.closest('#profileSetting'))){
+            this.closeProfileSetting()
+         }
+      });
 
-    displayConversations() {
-        const friendList = document.getElementById('friendList');
-        friendList.innerHTML = '';
-        for (let conversation of this.conversations) {
-            for (let member of conversation.members) {
-                if (String(member.user.id) !== String(this.currentUserId)) {
-                    const conversationHTML = `
-                        <div class="friend" data-conversation-username="${member.user.username}" data-conversation-id="${member.conversationId}">
-                            <div class="img"></div>
-                            <span class="friendUserName">${member.user.username}</span>
+   },
+
+   saveLanguageSelections() {
+      let conversationId = this.currentChatId;
+
+      const yourLanguage = document.getElementById('userChoice').value;
+      const translateTo = document.getElementById('targetLanguage').value;
+
+      const key = `currConversation${conversationId}`;
+
+      localStorage.setItem(
+         key,
+         JSON.stringify({ userChoice: yourLanguage, targetLanguage: translateTo })
+      );
+   },
+
+   getLanguageSelections(conversationId) {
+      const key = `currConversation${conversationId}`;
+      const storedLanguageSelections = localStorage.getItem(key);
+      if (storedLanguageSelections) {
+         const languageSelections = JSON.parse(storedLanguageSelections);
+         return languageSelections;
+      }
+   },
+
+   loadLanguageSelections() {
+      const conversationId = this.currentChatId;
+      const languageSelections = this.getLanguageSelections(conversationId);
+      if (languageSelections) {
+         document.getElementById('userChoice').value = languageSelections.userChoice;
+         document.getElementById('targetLanguage').value = languageSelections.targetLanguage;
+      }
+   },
+
+   async fetchConversations() {
+      const sidebar = document.querySelector('.chat-sidebar');
+      try {
+         LoaderUtil.showLoader(sidebar);
+         const response = await axios.get('/api/conversations');
+         this.conversations = response.data;
+         this.displayConversations();
+      } catch (err) {
+         console.error('Error fetching conversations:', err);
+      } finally {
+         LoaderUtil.hideLoader(sidebar);
+      }
+   },
+
+   displayConversations() {
+      const friendList = document.getElementById('friendList');
+      friendList.innerHTML = '';
+      for (let conversation of this.conversations) {
+         for (let member of conversation.members) {
+            if (String(member.user.id) !== String(this.currentUserId)) {
+               const conversationHTML = `
+                        <div class="friend" " data-conversation-avatar="${member.user.avatarUrl}" data-conversation-username="${member.user.username}" data-conversation-id="${member.conversationId}">
+                            <img src="${member.user.avatarUrl}" alt="" class="ConversatioinProfilePicture">
+                            <span class="friendUserName">${member.user.username} <div class="status"> </div></span>
                         </div>`;
-                    friendList.insertAdjacentHTML('beforeend', conversationHTML);
-                }
+               friendList.insertAdjacentHTML('beforeend', conversationHTML);
             }
-        }
-    },
+         }
+      }
+   },
 
+   async selectConversation(conversationId, conversationUsername, conversationAvatar) {
+      const chatMain = document.getElementById('chatMain');
+      try {
+         LoaderUtil.showLoader(chatMain);
 
-    async selectConversation(conversationId, conversationUsername) {
-        // Remove notification when conversation is selected
-        const conversationElement = document.querySelector(`.friend[data-conversation-id="${conversationId}"]`);
-        if (conversationElement) {
+         // Remove notification when conversation is selected
+         const conversationElement = document.querySelector(
+            `.friend[data-conversation-id="${conversationId}"]`
+         );
+         if (conversationElement) {
             conversationElement.classList.remove('has-notification');
             const badge = conversationElement.querySelector('.notification-badge');
             if (badge) badge.remove();
-        }
+         }
 
-        this.currentChatId = conversationId;
-        this.selectedConversationUserName = conversationUsername;
-        await this.fetchMessages(conversationId);
-    },
+         this.currentChatId = conversationId;
+         this.selectedConversationUserName = conversationUsername;
+         this.selectedConversationUserAvatar = conversationAvatar;
+         await this.fetchMessages(conversationId);
+      } catch (err) {
+         console.error('Error selecting conversation:', err);
+      } finally {
+         LoaderUtil.hideLoader(chatMain);
+      }
+   },
 
-    async fetchMessages(conversationId) {
-        try {
-            const response = await axios.get(`/api/message/messages?conversationId=${conversationId}`);
-            this.messages = response.data;
-            await this.displayMessages(this.messages);
-        } catch (err) {
-            console.error('Error fetching messages:', err);
-        }
-    },
+   MessageHTML(content, senderId, time, messageId = null) {
+      const isCurrentUser = String(senderId) === String(this.currentUserId);
 
-    initialChatWindow() {
-        if (!this.currentChatId) {
-            const chatMain = document.getElementById('chatMain');
-            chatMain.innerHTML = `
+      return `
+         <div class="message ${isCurrentUser ? 'user-message' : 'other-message'}">
+            <div id="${messageId}" class="messageContent">${content}</div>
+            <div class="messageFeature">
+               ${
+                  !isCurrentUser
+                     ? `<span data-id="${messageId}" data-content="${content}" id="quickTranslate" class="quickTranslate">
+                     <i class="fa-solid fa-repeat"></i>translate
+                   </span>`
+                     : ''
+               }
+               <span class="time">${time}</span>
+            </div>
+         </div>
+      `;
+   },
+
+   async fetchMessages(conversationId) {
+      try {
+         const response = await axios.get(`/api/message/messages?conversationId=${conversationId}`);
+         this.messages = response.data;
+         await this.displayMessages(this.messages);
+      } catch (err) {
+         console.error('Error fetching messages:', err);
+      }
+   },
+
+   initialChatWindow() {
+      if (!this.currentChatId) {
+         const chatMain = document.getElementById('chatMain');
+         chatMain.innerHTML = `
                 <div class="noConversation col-12 col-md-8">
                     <span>Open a conversation to start chat</span>
                 </div>`;
-        }
-    },
+      }
+   },
 
-    async displayMessages(messages) {
-        const chatMain = document.getElementById('chatMain');
-        chatMain.innerHTML = this.generateChatHTML(messages);
-        this.scrollToBottom();
-    },
+   async displayMessages(messages) {
+      const chatMain = document.getElementById('chatMain');
+      chatMain.innerHTML = this.generateChatHTML(messages);
+      this.scrollToBottom();
+   },
 
-    generateChatHTML(messages) {
-        return `
+   async clearChatHistory() {
+      try {
+         const conversationId = this.currentChatId;
+         console.log('sending chat delete request for conversation:', conversationId);
+
+         if (!conversationId) {
+            console.error('No conversation ID found');
+            return;
+         }
+
+         const response = await axios.delete(
+            `/api/message/delete?conversationId=${conversationId}`
+         );
+         console.log('Delete response:', response);
+
+         if (response.status === 200) {
+            await this.fetchMessages(conversationId);
+         }
+      } catch (error) {
+         console.error('Error deleting messages:', error);
+         // Handle error appropriately (show user message, etc.)
+      } finally {
+         popupManager.showStatus('Chat history cleared!');
+      }
+   },
+
+   generateChatHTML(messages) {
+      return `
             <div class="chat-header" id="chatHeader">
                 <div class="chat-header-info">
-                    <div class="img"></div>
-                    <h3 id="currentChatName">${this.selectedConversationUserName}</h3>
+                <div class="user-info" >
+                    <img src="${this.selectedConversationUserAvatar}" alt="" class="ConversatioinProfilePicture">
+                        <h3 id="currentChatName">${this.selectedConversationUserName}</h3>
+                        <div class="status"></div>
+                    </div>
+                <div class="chat-setting" id="chatSetting"> <i class="fa-solid fa-ellipsis-vertical"></i> </div>
                 </div>
             </div>
             <div class="chat-box" id="messageContainer">
@@ -513,129 +336,420 @@ const ChatManager = {
             <div class="chat-input">
                 <form id="messageForm">
                     <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
-                    <button type="submit">
+
+                    <button type="submit" name="action" value="send" class="btn btn-sm btn-dark send-btn">
                         <i class="fas fa-paper-plane"></i>
                         Send
                     </button>
+
+                    <button type="submit" name="action" value="translate" class="btn btn-sm btn-dark send-btn>
+                        <i class="fa-solid fa-repeat"></i>
+                        Translate
+                    </button>
+
+
                 </form>
             </div>
         `;
-    },
+   },
 
-    generateMessagesHTML(messages) {
-        return messages.map(msg => {
-            const senderId = String(msg.senderId);
-            const currentUserId = String(this.currentUserId);
-            return `
-                <div class="message ${senderId === currentUserId ? 'user-message' : 'other-message'}">
-                    ${msg.content}
-                </div>
-            `;
-        }).join('');
-    },
-
-    scrollToBottom() {
-        const messageContainer = document.getElementById('messageContainer');
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-    },
-
-    async createConversation(e) {
-        e.preventDefault();
-        const searchContainer = document.getElementById("searchResult");
-        const inputEmail = document.getElementById('searchInput').value;
-    
-        searchContainer.innerHTML = ''; 
-    
-        let friend = await this.getFriend(inputEmail);
-        if (friend) {
-            const resultHtml = `<div class="searchResult">${friend.username}</div> <button class="addFriendBtn btn btn-primary btn-sm">Add Friend </button>`;
-            searchContainer.innerHTML = resultHtml; 
-
-            const addBtn = document.querySelector(".addFriendBtn");
-            addBtn.addEventListener("click", () => this.addFriend(inputEmail));
-            
-        } else {
-            searchContainer.innerHTML = '<div class="searchResult">Friend not found</div>'; // Show a not found message
-            console.log("Friend not found");
-        }
-    },
-
-    async getFriend(inputEmail){
-        try {
-            const response = await axios.get("/api/conversations/friend",{
-                params: { email: inputEmail }
-            })
-            return response.data;
-
-        } catch (error) {
-             console.error(error);
-        }
-    },
-
-    async addFriend(inputEmail){
-        try {
-            let response  = await axios.post("/api/conversations/",{
-                email: inputEmail
+   generateMessagesHTML(messages) {
+      return messages
+         .map(msg => {
+            const isTime = new Date(msg.timestamp).toLocaleString('en-IN', {
+               timeZone: 'Asia/Kolkata',
+               hour12: true,
+               hour: '2-digit',
+               minute: '2-digit'
             });
-            // Clear search results after successful add
-            document.getElementById("searchResult").innerHTML = '';
-            document.getElementById('searchInput').value = '';
-            
-            // Refresh the conversations list immediately
-            await this.fetchConversations();
 
-        } catch (error) {
-            console.error(error);
-        }
+            return this.MessageHTML(msg.content, msg.senderId, isTime, msg.id);
+         })
+         .join('');
+   },
 
-    },
+   scrollToBottom() {
+      const messageContainer = document.getElementById('messageContainer');
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+   },
 
-    async handleMessageSubmit(event) {
-        event.preventDefault();
-        const messageInput = event.target.querySelector('#messageInput');
-        const content = messageInput.value.trim();
-        
-        if (!content || !this.currentChatId) {
+   async createConversation(e) {
+      e.preventDefault();
+      const searchContainer = document.getElementById('searchResult');
+      const inputEmail = document.getElementById('searchInput').value;
+
+      searchContainer.innerHTML = '';
+
+      let friend = await this.getFriend(inputEmail);
+      if (friend) {
+         const resultHtml = `<div class="searchResult">${friend.username}</div> <button class="addFriendBtn btn btn-primary btn-sm">Add Friend </button>`;
+         searchContainer.innerHTML = resultHtml;
+
+         const addBtn = document.querySelector('.addFriendBtn');
+         addBtn.addEventListener('click', () => this.addFriend(inputEmail));
+      } else {
+         searchContainer.innerHTML = '<div class="searchResult">Friend not found</div>'; // Show a not found message
+         console.log('Friend not found');
+      }
+   },
+
+   async getFriend(inputEmail) {
+      try {
+         const response = await axios.get('/api/conversations/friend', {
+            params: { email: inputEmail }
+         });
+         return response.data;
+      } catch (error) {
+         console.error(error);
+      }
+   },
+
+   async addFriend(inputEmail) {
+      try {
+         let response = await axios.post('/api/conversations/', {
+            email: inputEmail
+         });
+         // Clear search results after successful add
+         document.getElementById('searchResult').innerHTML = '';
+         document.getElementById('searchInput').value = '';
+
+         // Refresh the conversations list immediately
+         await this.fetchConversations();
+      } catch (error) {
+         console.error(error);
+      }
+   },
+
+   async handleMessageSubmit(event) {
+      event.preventDefault();
+      const messageBtn = event.target.querySelector('button[value="send"]');
+      const messageInput = event.target.querySelector('#messageInput');
+      const content = messageInput.value.trim();
+
+      if (!content || !this.currentChatId) {
+         return;
+      }
+
+      try {
+         LoaderUtil.showButtonLoader(messageBtn);
+         const response = await this.addMessage(content);
+         if (response) {
+            messageInput.value = '';
+         }
+      } catch (error) {
+         console.error('Error sending message:', error);
+      } finally {
+         LoaderUtil.hideButtonLoader(messageBtn);
+      }
+   },
+
+   //translation
+   async quickTranslate(content, messageId, messageDiv) {
+      let messageElement = document.getElementById(`${messageId}`);
+      const quickTranslateElement = messageDiv.querySelector('.quickTranslate');
+      const messageContentWrapper = messageElement?.parentElement;
+
+      if (quickTranslateElement.classList.contains('saved')) {
+         const storedData = localStorage.getItem(messageId);
+
+         if (storedData && Date.now() > storedData.expiry) {
+            localStorage.removeItem(messageId); // Delete expired item
+         } else {
+            const messageContent = storedData?.content;
+            messageElement.textContent = messageContent;
+            quickTranslateElement.classList.add('translated');
+            quickTranslateElement.innerHTML = '<i class="fa-solid fa-rotate-left"></i>revert';
             return;
-        }
+         }
+      }
 
-        try {
-            const response = await this.addMessage(content);
-            if (response) {
-                messageInput.value = '';
-                // Optionally refresh messages to ensure consistency
-                await this.fetchMessages(this.currentChatId);
-            }
-        } catch (error) {
-            console.error('Error sending message:', error);
-        }
-    },
+      if (quickTranslateElement.classList.contains('translated')) {
+         return;
+      }
 
-    async addMessage(content) {
-        try {
-            const response = await axios.post("/api/message", {
-                content,
-                senderId: this.currentUserId,
-                conversationId: this.currentChatId
+      try {
+         if (!messageElement) {
+            console.error('Element not found:', messageId);
+            return;
+         }
+         messageContentWrapper.style.position = 'relative';
+         LoaderUtil.showLoader(messageContentWrapper);
+         const response = await fetch('/api/translate/quick', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+               content,
+               userChoice: 'autodetect',
+               targetLanguage: 'Hinglish'
+            })
+         });
+
+         const data = await response.json();
+         if (response.status === 200) {
+            messageElement.textContent = data.result;
+            localStorage.setItem(messageId, {
+               content: data.result,
+               expiry: Date.now() + 24 * 60 * 60 * 1000 // 24 hours from now
+            });
+            quickTranslateElement.classList.add('translated');
+            quickTranslateElement.innerHTML = '<i class="fa-solid fa-rotate-left"></i>revert';
+
+            quickTranslateElement.onclick = e => {
+               e.stopPropagation();
+               messageElement.textContent = content;
+               quickTranslateElement.innerHTML = '<i class="fa-solid fa-repeat"></i>translate';
+               quickTranslateElement.classList.remove('translated');
+               quickTranslateElement.classList.add('saved');
+               // quickTranslateElement.onclick = null;
+            };
+         } else if (response.status === 429) {
+            alert('Too many translation requests. Please try again later.');
+         } else {
+            throw new Error(data.error || 'Translation failed');
+         }
+      } catch (err) {
+         console.error('Translation error:', err);
+         alert(`Translation failed: ${err.message}`);
+      } finally {
+         if (messageContentWrapper) {
+            messageContentWrapper.style.position = '';
+            LoaderUtil.hideLoader(messageContentWrapper);
+         }
+      }
+   },
+
+   async handleTranslateButton(e) {
+      e.preventDefault();
+      const conversationId = this.currentChatId;
+      const key = `currConversation${conversationId}`;
+      let value = localStorage.getItem(key);
+
+      if (value) {
+         const translateBtn = e.target.querySelector('button[value="translate"]');
+         const messageInput = e.target.querySelector('#messageInput');
+         const inputMessage = messageInput.value.trim();
+
+         if (!inputMessage) return;
+
+         try {
+            LoaderUtil.showButtonLoader(translateBtn);
+            const preferences = this.getLanguageSelections(this.currentChatId) || {
+               userChoice: 'autodetect',
+               targetLanguage: 'english'
+            };
+
+            const response = await fetch('/api/translate', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({
+                  inputMessage,
+                  userChoice: preferences.userChoice,
+                  targetLanguage: preferences.targetLanguage
+               })
             });
 
-            if (response.data) {
-                let  message = response.data.content;
-
-                // Emit new message event
-                this.socket.emit("newMessage", {
-                    conversationId: this.currentChatId,
-                    content: message,
-                    senderId: this.currentUserId
-                });
-                return response.data;
+            const data = await response.json();
+            if (response.status === 200) {
+               messageInput.value = data.result;
+            } else if (response.status === 429) {
+               alert('Too many translation requests. Please try again later.');
+            } else {
+               throw new Error(data.error || 'Translation failed');
             }
-            return null;
-        } catch (err) {
-            console.error("Error sending message:", err);
-        }
-    }
+         } catch (err) {
+            console.error('Translation error:', err);
+            alert(`Translation failed: ${err.message}`);
+         } finally {
+            LoaderUtil.hideButtonLoader(translateBtn);
+         }
+      } else {
+         popupManager.toggleTranslationSetting();
+      }
+   },
+
+   async addMessage(content) {
+      try {
+         const response = await axios.post('/api/message', {
+            content,
+            senderId: this.currentUserId,
+            conversationId: this.currentChatId
+         });
+
+         if (response.data) {
+            let message = response.data.content;
+            let timestamp = response.data.timestamp;
+            let messageId = response.data.id; // Make sure your API returns the message ID
+
+            const isTime = new Date(timestamp).toLocaleString('en-IN', {
+               timeZone: 'Asia/Kolkata',
+               hour12: true,
+               hour: '2-digit',
+               minute: '2-digit'
+            });
+
+            // Include messageId in socket emit
+            this.socket.emit('newMessage', {
+               conversationId: this.currentChatId,
+               content: message,
+               time: isTime,
+               senderId: this.currentUserId,
+               messageId: messageId // Add this
+            });
+            return response.data;
+         }
+         return null;
+      } catch (err) {
+         console.error('Error sending message:', err);
+      }
+   },
+
+   openProfileSetting(){
+      let profileOverlay = document.getElementById("profileOverlay");
+      profileOverlay.classList.add("active");
+   },
+
+   closeProfileSetting(){
+      let profileOverlay = document.getElementById("profileOverlay");
+      profileOverlay.classList.remove("active")
+
+   },
+
+   // chat setting slide overlay
+   toggleChatSetting() {
+      let slideOverlay = document.getElementById('slideOverlay');
+      slideOverlay.classList.toggle('active');
+   },
+
+   closeOverlaySetting() {
+      let slideOverlay = document.getElementById('slideOverlay');
+      slideOverlay.classList.remove('active');
+   }
 };
 
-// Initialize chat on load
-document.addEventListener('DOMContentLoaded', () => ChatManager.start());
+const popupManager = {
+   start() {
+
+      this.attachEventListeners();
+   },
+
+   attachEventListeners() {
+      document.querySelector('.menu-list').addEventListener('click', e => {
+         try {
+            if (e.target.id === 'translationSetting') {
+               this.toggleTranslationSetting();
+            } else if (e.target.id === 'clearChat') {
+               try {
+                  console.log('Button Clicked :');
+                  ChatManager.clearChatHistory();
+               } catch (error) {
+                  console.error(error);
+               }
+            }
+         } catch (error) {
+            console.error(error);
+         }
+      });
+
+      document.querySelector(".profile-list").addEventListener("click", (e) =>{
+         try {
+            if (e.target.id === "yourProfile"){
+               window.location.href = "/api/profile";
+            }
+         } catch (error) {
+            console.error(error);
+            
+         }
+      }),
+
+      document
+         .querySelector('.close')
+         .addEventListener('click', () => this.hideTranslationSetting());
+   },
+
+   toggleTranslationSetting() {
+      let settingsModal = document.querySelector('.modal');
+
+      settingsModal.classList.remove('hide');
+      settingsModal.classList.add('show');
+      ChatManager.loadLanguageSelections();
+   },
+
+   hideTranslationSetting() {
+      let settingsModal = document.querySelector('.modal');
+      settingsModal.classList.remove('show');
+      settingsModal.classList.add('hide');
+   },
+
+   showStatus(message, type = 'success') {
+      let statusDisplay = document.getElementById('statusDisplay');
+
+      statusDisplay.textContent = message;
+      statusDisplay.style.backgroundColor = type === 'error' ? '#dc3545' : '#28a745';
+      statusDisplay.style.display = 'block';
+
+      setTimeout(() => {
+         statusDisplay.style.display = 'none';
+      }, 2000);
+   }
+};
+
+// LoaderUtil object to manage loader operations
+const LoaderUtil = {
+   // Template for bootstrap spinner with overlay
+   getLoaderTemplate() {
+      return `
+            <div class="loader-overlay">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        `;
+   },
+
+   // Show loader in specified container
+   showLoader(containerElement) {
+      // Create loader element
+      const loaderEl = document.createElement('div');
+      loaderEl.classList.add('loader-container');
+      loaderEl.innerHTML = this.getLoaderTemplate();
+
+      // Add loader to container
+      containerElement.appendChild(loaderEl);
+   },
+
+   // Remove loader from container
+   hideLoader(containerElement) {
+      const loader = containerElement.querySelector('.loader-container');
+      if (loader) {
+         loader.remove();
+      }
+   },
+
+   // Convert button to loader
+   showButtonLoader(button) {
+      button.classList.add('btn-loading');
+      const loaderEl = document.createElement('div');
+      loaderEl.classList.add('spinner-border');
+      button.appendChild(loaderEl);
+   },
+
+   // Restore button from loader
+   hideButtonLoader(button) {
+      button.classList.remove('btn-loading');
+      const loader = button.querySelector('.spinner-border');
+      if (loader) {
+         loader.remove();
+      }
+   }
+};
+
+// Main initialization
+document.addEventListener('DOMContentLoaded', () => {
+      ChatManager.start();
+      popupManager.start();
+   // }
+});

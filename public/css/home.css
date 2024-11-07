@@ -57,11 +57,37 @@
     border-right: 1px solid var(--border);
     height: 100vh;
     overflow-y: auto;
+    position: relative;
+    min-height: 120px;
+    transition: all 0.3s ease;
   }
   
   .sidebar-header {
     padding: 1rem;
     border-bottom: 1px solid var(--border);
+  }
+
+  .profilePicture{
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1rem;
+    background-color: lightgray;
+  }
+  .ConversatioinProfilePicture{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit:cover;
+    background-color: gray;
+  }
+  .profile-setting {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-left: auto;
+
   }
   
   /* Search container styles */
@@ -113,6 +139,37 @@
     border-bottom: 1px solid var(--border);
     background-color: var(--bg-secondary);
   }
+  .chat-header-info{
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    padding: 1rem;
+    width: 100%
+  }
+  .user-info {    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  #currentChatName{
+    margin: 0;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .selectedConversationImg{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: black;
+    object-fit: cover; 
+  }
+  .chat-setting {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+
+  }
   
   .chat-box {
     flex-grow: 1;
@@ -127,6 +184,19 @@
     padding: 0.75rem 1rem;
     border-radius: 1rem;
     max-width: 70%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  .messageFeature{
+    color: black;
+    display: flex;
+    flex-direction: row;
+    justify-content:  space-between;
+    align-self: baseline;
+    width: 100%;
+    margin-top: 0.5rem;
   }
   
   .user-message {
@@ -134,6 +204,22 @@
     color: white;
     margin-left: auto;
     border-bottom-right-radius: 0.25rem;
+  }
+
+  .quickTranslate{
+    font-size: 0.7rem;
+    margin-right: auto;
+    cursor: pointer;
+    color: var(--text-primary)
+  }
+
+  .quickTranslate i {
+    margin-right: 0.5rem;
+  }
+
+  .time{
+    font-size: 0.7rem;
+    margin-left: auto;
   }
   
   .other-message {
@@ -220,3 +306,436 @@
       max-width: 85%;
     }
   }
+
+
+  /* profile setting */
+
+  .profile-overlay {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: rgba(18, 18, 18, 0.85); /* Dark background with transparency */
+    backdrop-filter: blur(10px); /* Creates the frosted glass effect */
+    -webkit-backdrop-filter: blur(10px); /* For Safari support */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    border-right: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+}
+
+.profile-overlay.active {
+    left: 0;
+}
+
+.profile-overlay-content {
+    padding: 20px 0px 20px 20px;
+    color: rgba(255, 255, 255, 0.87); /* Light text for dark background */
+}
+
+.profile-overlay-header {
+    padding: 15px 20px;
+    background: rgba(32, 32, 32, 0.9); /* Darker than main background */
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-close-overlay {
+    float: left;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.87);
+    transition: color 0.2s ease;
+    margin-left: auto;
+    font-size: 2rem;
+}
+
+.profile-close-overlay:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
+.profile-list {
+    list-style: none;
+    margin-top: 20px;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.profile-list li {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.87);
+    transition: background-color 0.2s ease;
+}
+
+.menu-list li:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+  /* chat setting */
+
+  .slide-overlay {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: rgba(18, 18, 18, 0.85); /* Dark background with transparency */
+    backdrop-filter: blur(10px); /* Creates the frosted glass effect */
+    -webkit-backdrop-filter: blur(10px); /* For Safari support */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    border-left: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+}
+
+.slide-overlay.active {
+    right: 0;
+}
+
+.overlay-content {
+    padding: 20px 20px 20px  0;
+    color: rgba(255, 255, 255, 0.87); /* Light text for dark background */
+}
+
+.overlay-header {
+    padding: 15px 20px;
+    background: rgba(32, 32, 32, 0.9); /* Darker than main background */
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.close-overlay {
+    float: right;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.87);
+    transition: color 0.2s ease;
+    font-size: 2rem;
+    margin-left: auto;
+}
+
+.close-overlay:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
+.menu-list {
+    list-style: none;
+    margin-top: 20px;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.menu-list li {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.87);
+    transition: background-color 0.2s ease;
+}
+
+.menu-list li:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* modal popup  */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  position: relative;
+  width: 500px;
+  background: #1a1d21;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Modal Header */
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: auto;
+  max-height: 80vh;
+  z-index: 1000;
+  border-radius: 16px;
+}
+
+/* Preserve original show/hide animations */
+.modal.show {
+  display: block;
+  animation: slideIn 0.3s ease-out;
+}
+
+.modal.hide {
+  animation: slideOut 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translate(-50%, -45%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -45%);
+    opacity: 0;
+  }
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  height: auto;
+  background: #1a1d21;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-header h2 {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.close:hover {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Select Styling */
+.form-select {
+  appearance: none;
+  background: #242830;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.form-select:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+}
+
+/* Custom dropdown arrow */
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+/* Dropdown options styling */
+.form-select option {
+  background: #242830;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.75rem;
+}
+
+/* Save Button */
+.save-btn {
+  margin-top: auto;
+  background: #1e4d3b;
+  border: 1px solid rgba(46, 213, 115, 0.3);
+  color: #2ed573;
+  padding: 0.875rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  background: #235344;
+  border-color: rgba(46, 213, 115, 0.4);
+}
+
+.save-btn:active {
+  transform: scale(0.98);
+}
+
+/* Add overlay when modal is shown */
+.modal::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: -1;
+}
+
+/* Status Display */
+.status-display {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  opacity: 0.9;
+  display: none;
+  z-index: 1000; /* Ensures it appears above other elements */
+}
+
+/* Loader Container */
+.loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+/* Loader Overlay */
+.loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+/* Spinner Customization - Silver Theme */
+.spinner-border {
+  width: 1.2rem;    /* Fixed size for button */
+  height: 1.2rem;   /* Fixed size for button */
+  border: 0.2em solid #C0C0C0;
+  border-right-color: transparent;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 2px rgba(192,192,192,0.5));
+}
+
+/* Loading Button State */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;  /* Disable clicks while loading */
+}
+
+.btn-loading .spinner-border {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -0.6rem;  /* Half of the spinner width */
+  margin-top: -0.6rem;   /* Half of the spinner height */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.user-info .status {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}

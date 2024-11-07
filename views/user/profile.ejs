@@ -1,0 +1,93 @@
+<% layout("/layouts/boilerplate")  %>
+
+<style>
+   :root {
+        /* Define profile card specific colors */
+        --profile-card-light: #ffffff;
+        --profile-card-dark: #2d2d2d;
+    }
+
+    [data-theme="light"] {
+        --profile-card-bg: var(--profile-card-dark);
+    }
+
+    [data-theme="dark"] {
+        --profile-card-bg: var(--profile-card-light);
+    }
+    .profile-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .form-control {
+    border: none;
+    border-radius: 10px;
+    background-color: var(--input-background);
+    transition: all 0.3s ease;
+    }
+
+    .profile-card {
+    border: none;
+    border-radius: 20px;
+    background-color: var(--profile-card-bg);
+    box-shadow: 0 10px 30px var(--shadow-color);
+    transition: all 0.3s ease;
+    color: var(--text-primary-light);
+}
+.header-details {
+  margin-left: auto;
+  padding: 2rem;
+  text-align: right;
+}
+
+  </style>
+<div id="mainProfile" class="container-fluid ">
+    <div id="" class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-6 col-lg-6">
+            <div class="container mx-auto my-8">
+                <div class=" profile-card">
+                  <div class="profile-header d-flex align-items-center mx-4 pt-4">
+                      <div class="d-flex  flex-column align-items-center">
+                        <img src="<%= user.avatarUrl %>" alt="Avatar" class="profile-image mx-4 mb-2">
+
+                          <button class="btn btn-sm text-danger removePhoto">Remove Photo</button>
+                        
+                      </div>
+                      <div class="header-details">
+                        <h3 class="username" id="username"><%= user.username %></h3>
+                        <p class="email" id="email"><%= user.email %></p>
+                      </div>
+                  </div>
+                  <hr>
+                  <div class="mx-5">
+                  <form action="/api/profile/<%= user.id %>?_method=PUT" method="POST" class="needs-validation px-6 py-2 space-y-4" enctype="multipart/form-data">
+                    <div class="mb-4">
+                      <label id="avatar" for="avatar" class="form-label profile-picture-label">Profile Picture</label>  
+                      <input name="avatar" type="file" class="form-control profile-picture-input w-full" />
+                    </div>
+                    <div>
+                      <label for="username" class="form-label">Name</label>
+                      <input type="text" id="name" name="username" class="form-control username w-full" value="<%= user.username %>">
+                    </div>
+                    <div class="mt-4">
+                      <label for="email" class="form-label">Email</label>
+                      <input disabled type="email" id="email" name="email" class="form-control w-full" value="<%= user.email %>">
+                    </div>
+                    <div>
+                      <button type="submit" class="btn btn-primary mt-4 mb-3">
+                        Update Profile
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                </div>
+              </div>
+        
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/profile.js"></script>
