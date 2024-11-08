@@ -26,7 +26,7 @@ module.exports.signup = async (req, res) => {
   const password = req.body.password;
   const username = req.body.username;
   const email = req.body.email;
-  const avatarUrl = "https://via.placeholder.com/150"
+  const avatarUrl = req.body.avatarUrl || "https://via.placeholder.com/150";
 
   const hashedPassword = await bcrypt.hash(password, 10);
 

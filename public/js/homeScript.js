@@ -1,7 +1,4 @@
-
 const ChatManager = {
-
-
    currentUserId: null,
    currentChatId: null,
    selectedConversationUserName: null,
@@ -69,7 +66,7 @@ const ChatManager = {
    },
 
    attachEventListeners() {
-      document.getElementById('profileSetting')?.addEventListener("click", () => {
+      document.getElementById('profileSetting')?.addEventListener('click', () => {
          this.openProfileSetting();
       });
 
@@ -86,6 +83,7 @@ const ChatManager = {
             if (clickedButton.value === 'send') {
                this.handleMessageSubmit(e);
             } else if (clickedButton.value === 'translate') {
+               console.log("translate button clicked");
                this.handleTranslateButton(e);
             }
          }
@@ -130,8 +128,8 @@ const ChatManager = {
             } else {
                const conversationUsername =
                   e.target.closest('.friend').dataset.conversationUsername;
-                  const conversationAvatar = e.target.closest(".friend").dataset.conversationAvatar
-               this.selectConversation(conversationId, conversationUsername, conversationAvatar);
+                  const conversationUserAvatar = e.target.closest(".friend").dataset.conversationUserAvatar;
+               this.selectConversation(conversationId, conversationUsername, conversationUserAvatar);
             }
          }
       });
@@ -146,15 +144,19 @@ const ChatManager = {
       });
 
       window.addEventListener('click', e => {
-         if (e.target.id === 'chatSetting' || (!e.target.closest('#slideOverlay') && !e.target.closest('#chatSetting'))
+         if (
+            e.target.id === 'chatSetting' ||
+            (!e.target.closest('#slideOverlay') && !e.target.closest('#chatSetting'))
          ) {
             this.closeOverlaySetting();
          }
-         if(e.target.id === "profileSetting" || (!e.target.closest('#profileOverlay') && !e.target.closest('#profileSetting'))){
-            this.closeProfileSetting()
+         if (
+            e.target.id === 'profileSetting' ||
+            (!e.target.closest('#profileOverlay') && !e.target.closest('#profileSetting'))
+         ) {
+            this.closeProfileSetting();
          }
       });
-
    },
 
    saveLanguageSelections() {
@@ -198,6 +200,9 @@ const ChatManager = {
          this.displayConversations();
       } catch (err) {
          console.error('Error fetching conversations:', err);
+         // Display an error message to the user or handle the error in a more graceful way
+         const errorMessage = 'Failed to fetch conversations. Please try again later.';
+         this.displayError(errorMessage);
       } finally {
          LoaderUtil.hideLoader(sidebar);
       }
@@ -209,10 +214,11 @@ const ChatManager = {
       for (let conversation of this.conversations) {
          for (let member of conversation.members) {
             if (String(member.user.id) !== String(this.currentUserId)) {
+               let avatarUrl = member.user.avatarUrl || 'https://via.placeholder.com/150';
                const conversationHTML = `
-                        <div class="friend" " data-conversation-avatar="${member.user.avatarUrl}" data-conversation-username="${member.user.username}" data-conversation-id="${member.conversationId}">
-                            <img src="${member.user.avatarUrl}" alt="" class="ConversatioinProfilePicture">
-                            <span class="friendUserName">${member.user.username} <div class="status"> </div></span>
+                        <div class="friend" data-conversation-avatar="${avatarUrl}" data-conversation-username="${member.user.username}" data-conversation-id="${member.conversationId}">
+                              <img class="friendProfilePicture" src="${avatarUrl}"  alt="avatarUrl"></img>
+                            <span class="friendUserName">${member.user.username}</span>
                         </div>`;
                friendList.insertAdjacentHTML('beforeend', conversationHTML);
             }
@@ -220,7 +226,7 @@ const ChatManager = {
       }
    },
 
-   async selectConversation(conversationId, conversationUsername, conversationAvatar) {
+   async selectConversation(conversationId, conversationUsername, conversationUserAvatar) {
       const chatMain = document.getElementById('chatMain');
       try {
          LoaderUtil.showLoader(chatMain);
@@ -237,7 +243,7 @@ const ChatManager = {
 
          this.currentChatId = conversationId;
          this.selectedConversationUserName = conversationUsername;
-         this.selectedConversationUserAvatar = conversationAvatar;
+         this.selectedConversationUserAvatar = conversationUserAvatar;
          await this.fetchMessages(conversationId);
       } catch (err) {
          console.error('Error selecting conversation:', err);
@@ -319,11 +325,14 @@ const ChatManager = {
    },
 
    generateChatHTML(messages) {
+      const defaultAvatar = 'https://via.placeholder.com/150';
+      const avatarUrl = this.selectedConversationUserAvatar || defaultAvatar;
+      
       return `
             <div class="chat-header" id="chatHeader">
                 <div class="chat-header-info">
                 <div class="user-info" >
-                    <img src="${this.selectedConversationUserAvatar}" alt="" class="ConversatioinProfilePicture">
+                <img src="${avatarUrl}" class="friendProfilePicture"></img>
                         <h3 id="currentChatName">${this.selectedConversationUserName}</h3>
                         <div class="status"></div>
                     </div>
@@ -552,6 +561,8 @@ const ChatManager = {
                })
             });
 
+            console.log(response)
+
             const data = await response.json();
             if (response.status === 200) {
                messageInput.value = data.result;
@@ -607,15 +618,14 @@ const ChatManager = {
       }
    },
 
-   openProfileSetting(){
-      let profileOverlay = document.getElementById("profileOverlay");
-      profileOverlay.classList.add("active");
+   openProfileSetting() {
+      let profileOverlay = document.getElementById('profileOverlay');
+      profileOverlay.classList.add('active');
    },
 
-   closeProfileSetting(){
-      let profileOverlay = document.getElementById("profileOverlay");
-      profileOverlay.classList.remove("active")
-
+   closeProfileSetting() {
+      let profileOverlay = document.getElementById('profileOverlay');
+      profileOverlay.classList.remove('active');
    },
 
    // chat setting slide overlay
@@ -632,7 +642,6 @@ const ChatManager = {
 
 const popupManager = {
    start() {
-
       this.attachEventListeners();
    },
 
@@ -654,20 +663,18 @@ const popupManager = {
          }
       });
 
-      document.querySelector(".profile-list").addEventListener("click", (e) =>{
+      document.querySelector('.profile-list').addEventListener('click', e => {
          try {
-            if (e.target.id === "yourProfile"){
-               window.location.href = "/api/profile";
+            if (e.target.id === 'yourProfile') {
+               window.location.href = '/api/profile';
             }
          } catch (error) {
             console.error(error);
-            
          }
       }),
-
-      document
-         .querySelector('.close')
-         .addEventListener('click', () => this.hideTranslationSetting());
+         document
+            .querySelector('.close')
+            .addEventListener('click', () => this.hideTranslationSetting());
    },
 
    toggleTranslationSetting() {
@@ -749,7 +756,7 @@ const LoaderUtil = {
 
 // Main initialization
 document.addEventListener('DOMContentLoaded', () => {
-      ChatManager.start();
-      popupManager.start();
+   ChatManager.start();
+   popupManager.start();
    // }
 });
