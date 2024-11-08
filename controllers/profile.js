@@ -28,8 +28,11 @@ module.exports.updateProfile = [
       const updateData = {
          ...(username && { username }),
          ...(email && { email }),
-         ...(req.file && { avatarUrl: req.file.path })
       };
+
+      if(req.file){
+          updateData.avatarUrl = req.file.secure_url;
+      }
       await prisma.user.update({
          where: { id },
          data: updateData
