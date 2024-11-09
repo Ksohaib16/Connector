@@ -1,7 +1,4 @@
 const prisma = require('../db/db');
-const { userSchema, loginSchema } = require('../schemaValidation');
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET;
 const authMiddleware = require('../authMiddleware');
 const multer = require('multer');
 const { storage } = require('../cloudConfig.js');
@@ -24,15 +21,14 @@ module.exports.updateProfile = [
    async (req, res) => {
       const id = req.userId;
       const { username, email } = req.body;
+      console.log(req.file)
 
       const updateData = {
          ...(username && { username }),
          ...(email && { email }),
+         ...(req.file && { avatarUrl: req.file.path })
       };
 
-      if(req.file){
-          updateData.avatarUrl = req.file.secure_url;
-      }
       await prisma.user.update({
          where: { id },
          data: updateData

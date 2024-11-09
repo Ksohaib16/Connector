@@ -83,7 +83,7 @@ const ChatManager = {
             if (clickedButton.value === 'send') {
                this.handleMessageSubmit(e);
             } else if (clickedButton.value === 'translate') {
-               console.log("translate button clicked");
+               console.log('translate button clicked');
                this.handleTranslateButton(e);
             }
          }
@@ -128,8 +128,13 @@ const ChatManager = {
             } else {
                const conversationUsername =
                   e.target.closest('.friend').dataset.conversationUsername;
-                  const conversationUserAvatar = e.target.closest(".friend").dataset.conversationUserAvatar;
-               this.selectConversation(conversationId, conversationUsername, conversationUserAvatar);
+               const conversationUserAvatar =
+                  e.target.closest('.friend').dataset.conversationAvatar;
+               this.selectConversation(
+                  conversationId,
+                  conversationUsername,
+                  conversationUserAvatar
+               );
             }
          }
       });
@@ -214,10 +219,10 @@ const ChatManager = {
       for (let conversation of this.conversations) {
          for (let member of conversation.members) {
             if (String(member.user.id) !== String(this.currentUserId)) {
-               let avatarUrl = member.user.avatarUrl || 'https://via.placeholder.com/150';
+               let avatarUrl = String(member.user.avatarUrl);
                const conversationHTML = `
                         <div class="friend" data-conversation-avatar="${avatarUrl}" data-conversation-username="${member.user.username}" data-conversation-id="${member.conversationId}">
-                              <img class="friendProfilePicture" src="${avatarUrl}"  alt="avatarUrl"></img>
+                              <img class="friendProfilePicture" src="${avatarUrl}"  alt="avatar"></img>
                             <span class="friendUserName">${member.user.username}</span>
                         </div>`;
                friendList.insertAdjacentHTML('beforeend', conversationHTML);
@@ -301,8 +306,6 @@ const ChatManager = {
    async clearChatHistory() {
       try {
          const conversationId = this.currentChatId;
-         console.log('sending chat delete request for conversation:', conversationId);
-
          if (!conversationId) {
             console.error('No conversation ID found');
             return;
@@ -325,9 +328,7 @@ const ChatManager = {
    },
 
    generateChatHTML(messages) {
-      const defaultAvatar = 'https://via.placeholder.com/150';
-      const avatarUrl = this.selectedConversationUserAvatar || defaultAvatar;
-      
+      const avatarUrl = this.selectedConversationUserAvatar;
       return `
             <div class="chat-header" id="chatHeader">
                 <div class="chat-header-info">
@@ -450,84 +451,142 @@ const ChatManager = {
       } finally {
          LoaderUtil.hideButtonLoader(messageBtn);
       }
-   },
-
-   //translation
-   async quickTranslate(content, messageId, messageDiv) {
-      let messageElement = document.getElementById(`${messageId}`);
-      const quickTranslateElement = messageDiv.querySelector('.quickTranslate');
-      const messageContentWrapper = messageElement?.parentElement;
-
-      if (quickTranslateElement.classList.contains('saved')) {
-         const storedData = localStorage.getItem(messageId);
-
-         if (storedData && Date.now() > storedData.expiry) {
-            localStorage.removeItem(messageId); // Delete expired item
-         } else {
-            const messageContent = storedData?.content;
-            messageElement.textContent = messageContent;
-            quickTranslateElement.classList.add('translated');
-            quickTranslateElement.innerHTML = '<i class="fa-solid fa-rotate-left"></i>revert';
-            return;
-         }
-      }
-
-      if (quickTranslateElement.classList.contains('translated')) {
-         return;
-      }
-
-      try {
+   }, 
+  
+      // Click handler for translate button
+      async quickTranslate(content, messageId, messageDiv) {
+         const messageElement = document.getElementById(`${messageId}`);
+         const quickTranslateElement = messageDiv.querySelector('.quickTranslate');
+         const messageContentWrapper = messageElement?.parentElement;
+         
          if (!messageElement) {
-            console.error('Element not found:', messageId);
-            return;
+             console.error('Element not found:', messageId);
+             return;
          }
-         messageContentWrapper.style.position = 'relative';
-         LoaderUtil.showLoader(messageContentWrapper);
-         const response = await fetch('/api/translate/quick', {
-            method: 'POST',
-            headers: {
-               'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-               content,
-               userChoice: 'autodetect',
-               targetLanguage: 'Hinglish'
-            })
-         });
-
-         const data = await response.json();
-         if (response.status === 200) {
-            messageElement.textContent = data.result;
-            localStorage.setItem(messageId, {
-               content: data.result,
-               expiry: Date.now() + 24 * 60 * 60 * 1000 // 24 hours from now
-            });
-            quickTranslateElement.classList.add('translated');
-            quickTranslateElement.innerHTML = '<i class="fa-solid fa-rotate-left"></i>revert';
-
-            quickTranslateElement.onclick = e => {
-               e.stopPropagation();
-               messageElement.textContent = content;
-               quickTranslateElement.innerHTML = '<i class="fa-solid fa-repeat"></i>translate';
-               quickTranslateElement.classList.remove('translated');
-               quickTranslateElement.classList.add('saved');
-               // quickTranslateElement.onclick = null;
-            };
-         } else if (response.status === 429) {
-            alert('Too many translation requests. Please try again later.');
+     
+         // Function to get translation from localStorage
+         const getStoredTranslation = () => {
+             try {
+                 const storedData = localStorage.getItem(messageId);
+                 if (!storedData) return null;
+     
+                 const data = JSON.parse(storedData);
+                 if (Date.now() > data.expiry) {
+                     localStorage.removeItem(messageId);
+                     return null;
+                 }
+                 return data.content;
+             } catch (error) {
+                 console.error('Error reading from localStorage:', error);
+                 return null;
+             }
+         };
+     
+         // Function to save translation to localStorage
+         const saveTranslation = (translatedContent) => {
+             try {
+                 const data = {
+                     content: translatedContent,
+                     expiry: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+                 };
+                 localStorage.setItem(messageId, JSON.stringify(data));
+             } catch (error) {
+                 console.error('Error saving to localStorage:', error);
+             }
+         };
+     
+         // Setup revert button functionality
+         const setupRevertButton = () => {
+             quickTranslateElement.innerHTML = '<i class="fa-solid fa-rotate-left"></i>revert';
+             quickTranslateElement.classList.add('translated');
+             
+             quickTranslateElement.onclick = (e) => {
+                 e.stopPropagation();
+                 // Revert to original content
+                 messageElement.textContent = content;
+                 // Reset button to translate state
+                 quickTranslateElement.innerHTML = '<i class="fa-solid fa-repeat"></i>translate';
+                 quickTranslateElement.classList.remove('translated');
+                 // Setup translate click handler
+                 setupTranslateButton();
+             };
+         };
+     
+         // Setup translate button functionality
+         const setupTranslateButton = () => {
+             quickTranslateElement.innerHTML = '<i class="fa-solid fa-repeat"></i>translate';
+             quickTranslateElement.classList.remove('translated');
+             
+             quickTranslateElement.onclick = async (e) => {
+                 e.stopPropagation();
+                 await handleTranslation();
+             };
+         };
+     
+         // Handle translation process
+         const handleTranslation = async () => {
+             // First check if translation exists in localStorage
+             const storedTranslation = getStoredTranslation();
+             if (storedTranslation) {
+                 // If found in localStorage, use it
+                 messageElement.textContent = storedTranslation;
+                 setupRevertButton();
+                 return;
+             }
+     
+             // If not in localStorage, make API call
+             try {
+                 messageContentWrapper.style.position = 'relative';
+                 LoaderUtil.showLoader(messageContentWrapper);
+     
+                 const response = await fetch('/api/translate/quick', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json'
+                     },
+                     body: JSON.stringify({
+                         content,
+                         userChoice: 'autodetect',
+                         targetLanguage: 'Hinglish'
+                     })
+                 });
+     
+                 const data = await response.json();
+     
+                 if (response.status === 200) {
+                     // Update UI with translated content
+                     messageElement.textContent = data.result;
+                     
+                     // Save translation to localStorage
+                     saveTranslation(data.result);
+                     
+                     // Setup revert button
+                     setupRevertButton();
+                 } else if (response.status === 429) {
+                     alert('Too many translation requests. Please try again later.');
+                 } else {
+                     throw new Error(data.error || 'Translation failed');
+                 }
+             } catch (err) {
+                 console.error('Translation error:', err);
+                 alert(`Translation failed: ${err.message}`);
+             } finally {
+                 if (messageContentWrapper) {
+                     messageContentWrapper.style.position = '';
+                     LoaderUtil.hideLoader(messageContentWrapper);
+                 }
+             }
+         };
+     
+         // Initial setup
+         const storedTranslation = getStoredTranslation();
+         if (storedTranslation) {
+             messageElement.textContent = storedTranslation;
+             setupRevertButton();
          } else {
-            throw new Error(data.error || 'Translation failed');
+             setupTranslateButton();
          }
-      } catch (err) {
-         console.error('Translation error:', err);
-         alert(`Translation failed: ${err.message}`);
-      } finally {
-         if (messageContentWrapper) {
-            messageContentWrapper.style.position = '';
-            LoaderUtil.hideLoader(messageContentWrapper);
-         }
-      }
-   },
+     },
 
    async handleTranslateButton(e) {
       e.preventDefault();
@@ -561,7 +620,7 @@ const ChatManager = {
                })
             });
 
-            console.log(response)
+            console.log(response);
 
             const data = await response.json();
             if (response.status === 200) {
