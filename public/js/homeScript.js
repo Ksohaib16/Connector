@@ -502,12 +502,9 @@ const ChatManager = {
              
              quickTranslateElement.onclick = (e) => {
                  e.stopPropagation();
-                 // Revert to original content
                  messageElement.textContent = content;
-                 // Reset button to translate state
                  quickTranslateElement.innerHTML = '<i class="fa-solid fa-repeat"></i>translate';
                  quickTranslateElement.classList.remove('translated');
-                 // Setup translate click handler
                  setupTranslateButton();
              };
          };
@@ -533,6 +530,12 @@ const ChatManager = {
                  setupRevertButton();
                  return;
              }
+             const controller = new AbortController();
+             const TIMEOUT_DURATION = 10000;
+
+             const timeoutId = setTimeout(() => {
+                controller.abort();  // This cancels the fetch request
+            }, TIMEOUT_DURATION);
      
              // If not in localStorage, make API call
              try {
@@ -542,19 +545,26 @@ const ChatManager = {
                  const response = await fetch('/api/translate/quick', {
                      method: 'POST',
                      headers: {
-                         'Content-Type': 'application/json'
+                         'Content-Type': 'application/json',
+                         'Accept': 'application/json'
                      },
                      body: JSON.stringify({
                          content,
                          userChoice: 'autodetect',
                          targetLanguage: 'Hinglish'
-                     })
+                     }),
+                     signal: controller.signal
                  });
      
                  const data = await response.json();
+                 if (!response.ok) {
+                  // If server sent error message, use it
+                  throw new Error(data.message || 'Something went wrong');
+              }
      
                  if (response.status === 200) {
                      // Update UI with translated content
+                     clearTimeout(timeoutId);
                      messageElement.textContent = data.result;
                      
                      // Save translation to localStorage
@@ -563,13 +573,13 @@ const ChatManager = {
                      // Setup revert button
                      setupRevertButton();
                  } else if (response.status === 429) {
+                  clearTimeout(timeoutId);
                       ('Too many translation requests. Please try again later.');
-                 } else {
-                     throw new Error(data.error || 'Translation failed');
-                 }
+                 } 
              } catch (err) {
                  console.error('Translation error:', err);
-                 popupManager.showStatus(err.message || "Transaltion failed")
+                 clearTimeout(timeoutId);
+                 popupManager.showStatus("Too many Request, Try later", type = "error")
              } finally {
                  if (messageContentWrapper) {
                      messageContentWrapper.style.position = '';

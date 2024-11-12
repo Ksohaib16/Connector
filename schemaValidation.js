@@ -13,3 +13,4 @@ module.exports.loginSchema = joi.object({
         password: joi.string().min(6).max(255).required(),
 });
 
+

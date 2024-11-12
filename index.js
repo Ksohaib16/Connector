@@ -125,9 +125,18 @@ app.use("/api/profile",  profileRoute);
 
 app.use((err, req, res, next) => {
    const { status = 500, message = 'Something went wrong' } = err;
-   res.render("error.ejs", {message});
- });
-
+   
+   // Check if request expects JSON
+   if (req.xhr || req.headers.accept.includes('application/json')) {
+       res.status(status).json({
+           error: true,
+           message: message
+       });
+   } else {
+       // For direct browser requests, render the EJS page
+       res.status(status).render("error.ejs", { message });
+   }
+});
 server.listen(3000, () => {
    console.log('server is running on port 3000');
 });

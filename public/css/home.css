@@ -5,7 +5,7 @@
     /* Light theme colors */
     --bg-primary-light: #ffffff;
     --bg-secondary-light: #f8f9fa;
-    --text-primary-light: #2c3e50;
+    --text-primary-light: #007aff;
     --border-light: #e9ecef;
     --accent-light: #3498db;
     --hover-light: #f1f3f5;
@@ -13,10 +13,10 @@
     /* Dark theme colors */
     --bg-primary-dark: #1a1a1a;
     --bg-secondary-dark: #2d2d2d;
-    --text-primary-dark: skyblue;
+    --text-primary-dark: #007aff;
 
     --border-dark: #404040;
-    --accent-dark: #4fa3d1;
+    --accent-dark: #0534aa;
     --hover-dark: #363636;
     
     /* Common colors */

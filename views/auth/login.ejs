@@ -14,8 +14,13 @@
                         <div class="mb-3">
                             <label for="password" class="form-label"></label>
                             <input type="password"  name="password" class="form-control" id="password" placeholder="Password" required>
-
+                            <small class="text-danger">
+                                <% if (message) { %> 
+                                    <%= message %> 
+                                <% } %>
+                              </small>
                         </div>
+
                         <button type="submit" class="btn btn-primary w-100" id="authButton">Login</button>
 
                     </form>

@@ -4,13 +4,14 @@ const { userSchema, loginSchema } = require("../schemaValidation");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 const bcrypt = require('bcrypt');
+const ExpressError = require("../utils/ExpressError");
 
 
 module.exports.renderSignup = (req, res) => {
-  res.render("auth/signup.ejs");
+  res.render("auth/signup.ejs", {message: null});
 };
 
-module.exports.signup = async (req, res) => {
+module.exports.signup = async (req, res, next) => {
   let { error } = userSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
@@ -21,8 +22,9 @@ module.exports.signup = async (req, res) => {
   });
 
   if (existingUser) {
-    return res.status(400).send("Email already exists");
+    return res.status(400).render("auth/signup.ejs", { message: "Email already exists" });
   }
+
   const password = req.body.password;
   const username = req.body.username;
   const email = req.body.email;
@@ -53,10 +55,10 @@ module.exports.signup = async (req, res) => {
 };
 
 module.exports.renderLogin = (req, res) => {
-  res.render("auth/login.ejs");
+  res.render("auth/login.ejs", {message: null});
 };
 
-module.exports.login = async (req, res) => {
+module.exports.login = async (req, res, next) => {
   let { error } = loginSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
@@ -88,10 +90,10 @@ try {
   
     res.redirect("/api/home");
   }else{
-    res.status(401).json({ error: "Invalid email or password" });
+    return res.status(401).render("auth/login.ejs",{message: "Invalid email or password" });
   }
  
 } catch (error) {
-  
+  next(error)
 }  
 };
