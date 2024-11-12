@@ -12,6 +12,7 @@ const messageRoute = require('./routes/messageRoute.js');
 const translateRoute = require('./routes/translateRoute.js');
 const profileRoute = require('./routes/profileRoute.js');
 const prisma = require('./db/db.js');
+const ExpressError = require('./utils/ExpressError');
 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -121,6 +122,11 @@ app.use('/api/conversations', conversationsRoute);
 app.use('/api/message', messageRoute);
 app.use('/api/translate', translateRoute);
 app.use("/api/profile",  profileRoute);
+
+app.use((err, req, res, next) => {
+   const { status = 500, message = 'Something went wrong' } = err;
+   res.render("error.ejs", {message});
+ });
 
 server.listen(3000, () => {
    console.log('server is running on port 3000');

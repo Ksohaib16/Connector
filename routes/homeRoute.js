@@ -1,20 +1,9 @@
-const express = require('express'); 
+const express = require('express');
 const router = express.Router();
+const wrapAsync = require('../utils/wrapAsync.js');
 
-const homeController = require("../controllers/home.js")
+const homeController = require('../controllers/home.js');
 
-router.route("/").get(homeController.renderHome)
-
-// router.route("/search").get(homeController.search);
-
-// router.route("/new").post(homeController.addFriend);
-
-// router.route("/friends").get(homeController.getFriends);
-
-// router.route("/deleteFriend").delete(homeController.deleteFriend);
-
-
-
-
+router.route('/').get(homeController.renderHome);
 
 module.exports = router;

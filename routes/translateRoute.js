@@ -1,10 +1,12 @@
 const express = require('express'); 
 const router = express.Router();
+const wrapAsync = require("../utils/wrapAsync");
 
-const translateController = require("../controllers/translate.js")
+const translateController = require("../controllers/translate.js");
 
-router.post("/", translateController.translate)
-router.post("/quick", translateController.translate)
+
+router.post("/",wrapAsync(translateController.translate));
+router.post("/quick",wrapAsync(translateController.translate));
 
 
 module.exports = router;

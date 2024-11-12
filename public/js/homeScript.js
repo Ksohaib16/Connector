@@ -563,13 +563,13 @@ const ChatManager = {
                      // Setup revert button
                      setupRevertButton();
                  } else if (response.status === 429) {
-                     alert('Too many translation requests. Please try again later.');
+                      ('Too many translation requests. Please try again later.');
                  } else {
                      throw new Error(data.error || 'Translation failed');
                  }
              } catch (err) {
                  console.error('Translation error:', err);
-                 alert(`Translation failed: ${err.message}`);
+                 popupManager.showStatus(err.message || "Transaltion failed")
              } finally {
                  if (messageContentWrapper) {
                      messageContentWrapper.style.position = '';
@@ -632,7 +632,9 @@ const ChatManager = {
             }
          } catch (err) {
             console.error('Translation error:', err);
-            alert(`Translation failed: ${err.message}`);
+            if(err.message){
+            popupManager.showStatus("Too many request", type = "error")
+            }
          } finally {
             LoaderUtil.hideButtonLoader(translateBtn);
          }
