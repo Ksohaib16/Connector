@@ -1,40 +1,80 @@
-<% layout("/layouts/boilerplate")  %>
-
-<div id="app" class="container-fluid ">
-    <div id="authContainer" class="row justify-content-center align-items-center min-vh-100">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-lg">
-                <div class="card-body p-5">
-                    <h1 class="card-title text-center mb-4" id="authTitle">Sign up</h1>
-                    <form action="/api/auth/Signup" method="POST" id="authForm" class="needs-validation" novalidate>
-
-                        <div id="nameField" class="mb-3">
-                           <label for="username" class="form-label"></label>
-                            <input type="text" name="username" class="form-control" id="username" placeholder="Username" required>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connector</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/register.css">
+    <!-- <link rel="stylesheet" href="/css/home.css"> -->
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <div id="app" class="container-fluid ">
+        <div id="authContainer" class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-12 col-md-6 col-lg-4 col-xl-3 inner-box">
+                <div class="col-6">
+                    <div class="card shadow-lg">
+                        <div class="card-body">
+                            <h1 class="card-title text-left mb-3" id="authTitle">Sign up</h1>
+                            <form action="/api/auth/Signup" method="POST" id="authForm" class="needs-validation" novalidate>
+                                <div id="nameField" class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control" id="username" placeholder="Jake" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" id="email" placeholder="user@gmail.com" required>
+                                    <small class="text-danger">
+                                        <% if (message) { %> 
+                                            <%= message %> 
+                                        <% } %>
+                                    </small>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password"  name="password" class="form-control" id="password" placeholder="Password" required>
+        
+                                </div>
+                                <button type="submit" class="btn w-100" id="authButton">Signup</button>
+        
+                            </form>
+                            <div class="auth">
+                                <span>Already have an account?</span>
+                                <a href="/api/auth/login" id="toggleAuth">Login</a>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label"></label>
-                            <input type="email" name="email" class="form-control" id="email" placeholder="Email" required>
-
-                            <small class="text-danger">
-                                <% if (message) { %> 
-                                    <%= message %> 
-                                <% } %>
-                              </small>
+                    </div>
+                </div>
+                <div class="col-6 d-flex">
+                    <div class="hero-area p-4">
+                        <div class="hero-content-top">
+                            <h1>Connector</h1>
+                            <p>Let's really connect</p>
                         </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label"></label>
-                            <input type="password"  name="password" class="form-control" id="password" placeholder="Password" required>
-
+                        <div class="hero-image">
                         </div>
-                        <button type="submit" class="btn btn-primary w-100" id="authButton">Signup</button>
-
-                    </form>
-                    <p class="text-center mt-3">
-                        <a href="/api/auth/login" id="toggleAuth">Already have an account? Login</a>
-                    </p>
+                        <br>
+                        <div class="hero-content">
+                            <h4>A Messenger with Super Powers</h4>
+                             <p>"Connector" is a messenger web app designed to litreally connect everyone on planet Earth</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/register.js"></script>
+    <!-- <script src="/js/theme.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</body>
+</html>
+
+
 

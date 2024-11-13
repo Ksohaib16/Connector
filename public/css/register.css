@@ -1,39 +1,47 @@
-:root {
+/*:root {
     --primary-color: #007AFF;
     --secondary-color: #5AC8FA;
     --background-color: #F2F2F7;
     --text-color: #1C1C1E;
-    --card-background: #FFFFFF;
+    --lg-card-background: #FFFFFF;
+    --dr-card-background: #FFFFFF;
     --input-background: #E5E5EA;
     --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    /* background-color: var(--background-color); */
-    /* background-color: black; */
-    color: var(--text-color);
-    transition: all 0.3s ease;
+[data-theme="light"] {
+    --card-background: rgba(255, 255, 255, 0.5);
 }
 
+[data-theme="dark"] {
+    --card-background: rgba(40, 40, 40, 0.5);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    background-image: url('/main-background.png');
+
+}
 
 .card {
     border: none;
     border-radius: 20px;
-    /* background-color: var(--card-background); */
-    /* background-color: grey; */
-    box-shadow: 0 10px 30px var(--shadow-color);
+    background-color: var(--card-background);
     transition: all 0.3s ease;
-}
-
-#authTitle{
-    font-weight:700 !important;
+    backdrop-filter: blur(10px);
 }
 
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 35px var(--shadow-color);
 }
+
+#authTitle{
+    font-weight:700 !important;
+}
+
 
 .card-header {
     border-top-left-radius: 20px !important;
@@ -113,3 +121,143 @@ body {
 #toggleAuth:hover {
     color: var(--secondary-color);
 }
+    */
+
+body{
+    background-color: gray;
+    color: #1C1C1E;
+    transition: all 0.3s ease !important;
+    background-image: url('/images/inner-box.png') !important; 
+    background-color: #FFD1B0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed ;
+    background-position: center ;
+    transition: background-image 0.3s ease ;
+}
+
+.inner-box {
+    width: 72vw; /* Scales with viewport width */
+    height: 80vh; /* Scales with viewport height */
+    max-width: 1366px;
+    max-height: 768px;
+    background-image: url("/images/main-box.png");
+    background: linear-gradient(to right, rgba(254, 221, 198, 0), rgba(254, 221, 198, 1));
+    border-radius: 2rem;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
+    padding: 0 2.5rem;
+}
+
+.card{
+    height: 500px;
+    width: 25vw;
+    border: none;
+    border-radius: 1.2rem;
+    background-color: rgba(255, 255, 255, 0.245); /* Make background semi-transparent */
+    backdrop-filter: blur(5px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.20);
+
+}
+
+.card-body{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px var(--shadow-color);
+}
+
+.card-title{
+    font-size: 3rem;
+    font-weight:700;
+    color: #333333;
+}
+.hero-area{
+    height: 600px;
+    width: 30vw;
+}
+
+.hero-content-top h1{
+    font-weight: 700;
+    text-align: center;
+    font-size: 4rem;
+    color:#AE4700;
+}
+
+.hero-content-top p{
+    margin-top: -0.5rem;
+text-align: center;
+color: #7B3F00;
+}
+
+.hero-image{
+    width: 100%;
+    height: 55%;
+    background-image: url("/images/hero-image.png");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.hero-content{
+    background-color: rgba(255, 255, 255, 0.124);
+    backdrop-filter: blur(10px);
+    border-radius: 2rem;
+}
+.hero-content h4{
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.hero-content p {
+    list-style: none;
+    text-align: center;
+    color: #7B3F00;
+}
+
+
+.forgot{
+    display: flex;
+    justify-content: end;
+    margin-bottom: 1rem;
+}
+
+.forgot span{
+    font-size: 0.9rem;
+    color: #AE4700;
+}
+.btn{
+    background-color: #F25019;
+    color: #fff;
+}
+.btn:hover{
+    border: 2px solid #333333;
+    background-color: #F25019;
+}
+
+.auth{
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto; /* Pushes .auth to the bottom */
+}
+.auth span{
+    color: #333333;
+}
+
+#toggleAuth{
+    color: #AE4700;
+    text-decoration: none;
+    font-weight: 600;
+}
+

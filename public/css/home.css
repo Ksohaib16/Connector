@@ -13,8 +13,9 @@
     /* Dark theme colors */
     --bg-primary-dark: #1a1a1a;
     --bg-secondary-dark: #2d2d2d;
-    --text-primary-dark: #007aff;
+    --text-primary-dark: #50b6ff;
 
+ 
     --border-dark: #404040;
     --accent-dark: #0534aa;
     --hover-dark: #363636;
@@ -746,4 +747,43 @@
   font-size: 12px;
   color: #666;
   margin-top: 2px;
+}
+
+
+
+.chat-messages {
+  height: 400px;
+  overflow-y: auto;
+}
+
+.message {
+  max-width: 75%;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  border-radius: 18px;
+  animation: message-appear 0.3s ease-out;
+}
+
+.message-sent {
+  background-color: var(--primary-color);
+  color: #FFFFFF;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.message-received {
+  background-color: var(--input-background);
+  color: var(--text-color);
+  align-self: flex-start;
+}
+
+@keyframes message-appear {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
 }
