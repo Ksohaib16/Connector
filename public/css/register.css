@@ -1,127 +1,7 @@
-/*:root {
-    --primary-color: #007AFF;
-    --secondary-color: #5AC8FA;
-    --background-color: #F2F2F7;
-    --text-color: #1C1C1E;
-    --lg-card-background: #FFFFFF;
-    --dr-card-background: #FFFFFF;
-    --input-background: #E5E5EA;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+html {
+    font-size: 100%;
 }
 
-[data-theme="light"] {
-    --card-background: rgba(255, 255, 255, 0.5);
-}
-
-[data-theme="dark"] {
-    --card-background: rgba(40, 40, 40, 0.5);
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    color: var(--text-color);
-    transition: all 0.3s ease;
-    background-image: url('/main-background.png');
-
-}
-
-.card {
-    border: none;
-    border-radius: 20px;
-    background-color: var(--card-background);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px var(--shadow-color);
-}
-
-#authTitle{
-    font-weight:700 !important;
-}
-
-
-.card-header {
-    border-top-left-radius: 20px !important;
-    border-top-right-radius: 20px !important;
-    background-color: var(--primary-color) !important;
-}
-
-.form-control {
-    border: none;
-    border-radius: 10px;
-    background-color: var(--input-background);
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25);
-}
-
-.btn {
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-.btn-primary:hover {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-}
-
-.chat-messages {
-    height: 400px;
-    overflow-y: auto;
-}
-
-.message {
-    max-width: 75%;
-    margin-bottom: 15px;
-    padding: 10px 15px;
-    border-radius: 18px;
-    animation: message-appear 0.3s ease-out;
-}
-
-.message-sent {
-    background-color: var(--primary-color);
-    color: #FFFFFF;
-    align-self: flex-end;
-    margin-left: auto;
-}
-
-.message-received {
-    background-color: var(--input-background);
-    color: var(--text-color);
-    align-self: flex-start;
-}
-
-@keyframes message-appear {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-#toggleAuth {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-#toggleAuth:hover {
-    color: var(--secondary-color);
-}
-    */
 
 body{
     background-color: gray;
@@ -137,40 +17,38 @@ body{
 }
 
 .inner-box {
-    width: 72vw; /* Scales with viewport width */
-    height: 80vh; /* Scales with viewport height */
-    max-width: 1366px;
-    max-height: 768px;
     background-image: url("/images/main-box.png");
     background: linear-gradient(to right, rgba(254, 221, 198, 0), rgba(254, 221, 198, 1));
     border-radius: 2rem;
-    margin: auto;
-    display: flex;
-    align-items: center;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.3);
     padding: 0 2.5rem;
+    height: 80vh;
+
 }
 
+
 .card{
-    height: 500px;
-    width: 25vw;
+    height: 100%;
+    width: 70%;
     border: none;
     border-radius: 1.2rem;
     background-color: rgba(255, 255, 255, 0.245); /* Make background semi-transparent */
     backdrop-filter: blur(5px);
     box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.20);
-
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .card-body{
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding-left: 2rem;
-    padding-right: 2rem;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding: 1rem;
 }
+
 
 .card:hover {
     transform: translateY(-5px);
@@ -182,27 +60,33 @@ body{
     font-weight:700;
     color: #333333;
 }
-.hero-area{
-    height: 600px;
-    width: 30vw;
-}
 
-.hero-content-top h1{
+
+.header h1{
     font-weight: 700;
     text-align: center;
-    font-size: 4rem;
+    font-size: 3.5rem;
     color:#AE4700;
+    padding-top: 1rem;
 }
 
-.hero-content-top p{
+.header p{
     margin-top: -0.5rem;
 text-align: center;
 color: #7B3F00;
 }
 
+.hero-area{
+    width: 80%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
 .hero-image{
     width: 100%;
-    height: 55%;
+    height: 80%;
     background-image: url("/images/hero-image.png");
     background-size: contain;
     background-position: center;
@@ -212,6 +96,7 @@ color: #7B3F00;
     background-color: rgba(255, 255, 255, 0.124);
     backdrop-filter: blur(10px);
     border-radius: 2rem;
+    margin-top: auto;
 }
 .hero-content h4{
     font-size: 1.2rem;
@@ -261,3 +146,142 @@ color: #7B3F00;
     font-weight: 600;
 }
 
+
+@media (max-width: 1200px) {
+    html {
+        font-size: 95%;
+    }
+}
+
+@media (max-width: 992px) {
+    html {
+        font-size: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 85%;
+    }
+}
+
+/* Responsive Layout */
+@media (max-width: 992px) {
+    .inner-box {
+        padding: 0 1.5rem;
+        height: auto;
+        min-height: 80vh;
+    }
+
+    .card {
+        width: 85%;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    .card-title {
+        font-size: 2.5rem;
+    }
+
+    .header h1 {
+        font-size: 3rem;
+    }
+}
+
+/* Tablet and smaller screens */
+@media (max-width: 768px) {
+    .inner-box {
+        padding: 1rem;
+        align-items: center;
+    }
+
+    #authContainer {
+        flex-direction: column;
+    }
+
+    .col-6 {
+        width: 100%;
+        margin-bottom: 1rem;
+        display: flex;         /* Add flex to center card */
+        justify-content: center;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 450px; 
+        margin: 0;
+        padding: 0.5rem;
+    }
+
+    .hero-image {
+        display: none; 
+    }
+
+    .card-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .auth {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile screens */
+@media (max-width: 576px) {
+    .inner-box {
+        padding: 0.5rem;
+    }
+
+    .card {
+        width: 95%;         /* Slightly smaller width on very small screens */
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        padding-top: 0.5rem;
+    }
+
+    .header p {
+        font-size: 0.9rem;
+    }
+
+    .card-body {
+        padding: 0.25rem;
+    }
+
+    .card-title {
+        font-size: 1.75rem;
+    }
+
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+}
+
+/* Container adjustments */
+@media (max-width: 1200px) {
+    .container.col-8 {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container.col-8 {
+        max-width: 95%;
+    }
+}
