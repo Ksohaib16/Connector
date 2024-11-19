@@ -1,3 +1,5 @@
+// const { default: axios } = require("axios");
+
 const ChatManager = {
    currentUserId: null,
    currentChatId: null,
@@ -108,10 +110,10 @@ const ChatManager = {
       });
 
       document.querySelector('.close-overlay').addEventListener('click', () => {
-         console.log('close button clicked');
          this.closeOverlaySetting();
       });
 
+      // conversation creation
       document
          .getElementById('createConversationForm')
          ?.addEventListener('submit', e => this.createConversation(e));
@@ -136,6 +138,11 @@ const ChatManager = {
                   conversationUserAvatar
                );
             }
+         }
+         if(e.target.closest(".del-convesation")){ 
+            e.stopPropagation();
+            const conversationId = e.target.closest('.friend').dataset.conversationId;
+            this.deleteConversation(conversationId);
          }
       });
 
@@ -163,6 +170,11 @@ const ChatManager = {
          }
       });
    },
+
+      async deleteConversation(conversationId){
+         console.log("delete convesaton method triggered");
+
+      },
 
    saveLanguageSelections() {
       let conversationId = this.currentChatId;
@@ -224,6 +236,11 @@ const ChatManager = {
                         <div class="friend" data-conversation-avatar="${avatarUrl}" data-conversation-username="${member.user.username}" data-conversation-id="${member.conversationId}">
                               <img class="friendProfilePicture" src="${avatarUrl}"  alt="avatar"></img>
                             <span class="friendUserName">${member.user.username}</span>
+                            <div class="del-convesation">
+                            <button class="btn btn-sm del-conversation-btn id="delConvesationBtn">
+                            <i class="fa-solid fa-trash"></i>
+                            </button>
+                            </div>
                         </div>`;
                friendList.insertAdjacentHTML('beforeend', conversationHTML);
             }

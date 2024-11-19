@@ -109,4 +109,8 @@ module.exports.getAll = [authMiddleware, async(req, res) =>{
   }catch(err){
     console.error("Error fetching conversations:", err);
   }
+}];
+
+module.exports.delete = [authMiddleware, async (req, res) => {
+  
 }]
