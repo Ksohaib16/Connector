@@ -111,6 +111,61 @@ module.exports.getAll = [authMiddleware, async(req, res) =>{
   }
 }];
 
-module.exports.delete = [authMiddleware, async (req, res) => {
-  
-}]
+module.exports.delete = [
+  authMiddleware,
+  async (req, res) => {
+    const { conversationId } = req.body;
+    const currentUserId = req.userId;
+
+    try {
+      await prisma.$transaction(async (prisma) => {
+        // Check if the conversation exists and belongs to the current user
+        const conversation = await prisma.conversation.findFirst({
+          where: {
+            id: conversationId,
+            members: {
+              some: {
+                userId: currentUserId,
+              },
+            },
+          },
+        });
+
+        if (!conversation) {
+          return res.status(404).json({
+            success: false,
+            message: "Conversation not found or you don't have permission to delete it"
+          });
+        }
+
+        // Delete messages first
+        await prisma.message.deleteMany({
+          where: { conversationId }
+        });
+
+        // Delete conversation members
+        await prisma.conversationMember.deleteMany({
+          where: { conversationId }
+        });
+
+        // Delete the conversation itself
+        await prisma.conversation.delete({
+          where: { id: conversationId }
+        });
+
+        // Successful response
+        res.status(200).json({
+          success: true,
+          message: "Conversation deleted successfully"
+        });
+      });
+    } catch (err) {
+      console.error("Error deleting conversation:", err);
+      res.status(500).json({
+        success: false,
+        message: "Failed to delete conversation"
+      });
+    }
+  },
+];
+

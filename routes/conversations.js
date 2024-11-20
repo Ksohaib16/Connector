@@ -13,7 +13,7 @@ router.post("/", conversationController.create);
 // //get all
 router.get("/", conversationController.getAll);
 
-router.delete("/delete", wrapAsync(conversationController.delete))
+router.delete("/delete", conversationController.delete)
 
 
-module.exports = router;
+module.exports = router; 
