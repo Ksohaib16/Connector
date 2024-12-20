@@ -33,11 +33,13 @@ export const signup: RequestHandler = async (req, res) => {
       id: firebaseUser?.uid,
       username: req.body.username,
       email: firebaseUser?.email,
+      avatarUrl: req.body.avatarUrl,
     },
   });
 
   res.status(200).json({
     message: "User created successfully",
+    user,
   });
 };
 
@@ -66,6 +68,7 @@ export const login: RequestHandler = async (req, res) => {
   }
   res.status(200).json({
     message: "User logged in successfully",
+    user,
   })
 
 };

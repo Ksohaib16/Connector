@@ -15,5 +15,9 @@ export const loginBody = z.object({
   email: z.string().email({ message: "Invalid email address" }),
 })
 
+export const searchFriendBody = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+}).strict();
+
 // Create TypeScript type from Zod schema
 export type UserCreateInput = z.infer<typeof signupBody>;

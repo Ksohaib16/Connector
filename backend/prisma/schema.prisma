@@ -28,12 +28,9 @@ model User {
 
 model Conversation {
   id            String              @id @default(nanoid())
-  // This connects to ConversationMembernode
   members       ConversationMember[]
-  // This connects to all messages in the conversation
   messages      Message[]
   lastMessageId String?             
-  // This defines the special relation for the last message
   lastMessage   Message?            @relation("LastMessage", references: [id], fields: [lastMessageId])
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt

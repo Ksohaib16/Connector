@@ -1,4 +1,3 @@
-import express from  "express";
 import { Router } from "express"
 import { verifyToken } from "../firebase-config/firebaseConfig";
 const router = Router();
