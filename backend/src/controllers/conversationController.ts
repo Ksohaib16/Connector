@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
 import prisma from "../db/prisma";
 import { searchFriendBody } from "../models/schemaValidation";
-import { verifyToken } from "../firebase-config/firebaseConfig";
 
 export const getFriend: RequestHandler = async (req, res) => {
   const result = searchFriendBody.safeParse(req.body);
@@ -28,18 +27,43 @@ export const getFriend: RequestHandler = async (req, res) => {
     return;
   }
 
-  res.status(200).json({ friend });
+  res.status(200).json({ message: "Friend found successfuly", friend });
   return;
 };
 
 export const createConversationAndMember: RequestHandler = async (req, res) => {
-  const user = req.body;
+  const { id, email } = req.body;
 
+  if (!id || !email) {
+    res.status(400).json({ error: "Id and email are required" });
+    return;
+  }
+
+  const currUserId = req.user?.uid;
   const currUserEmail = req.user?.email;
-  const { email } = user;
 
   if (email === currUserEmail) {
     res.status(400).json({ error: "You can't add yourself as a friend" });
+    return;
+  }
+
+  const existingConversation = await prisma.conversation.findFirst({
+    where: {
+      members: {
+        every: {
+          userId: {
+            in: [currUserId, id],
+          },
+        },
+      },
+    },
+  });
+
+  if (existingConversation) {
+    res.status(200).json({
+      message: "conversation already exists",
+      existingConversation,
+    });
     return;
   }
 
@@ -49,19 +73,29 @@ export const createConversationAndMember: RequestHandler = async (req, res) => {
         create: [
           {
             user: {
-              connect: { id: req.user?.uid },
+              connect: { id: currUserId },
             },
           },
           {
             user: {
-              connect: { id: user.id },
+              connect: { id },
             },
           },
         ],
       },
     },
   });
-  res.status(200).json({ newConversation });
+
+  if (!newConversation) {
+    return;
+  }
+
+  res
+    .status(200)
+    .json({
+      message: "conversation created and members added",
+      newConversation,
+    });
   return;
 };
 

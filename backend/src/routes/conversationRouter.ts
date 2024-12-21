@@ -5,12 +5,22 @@ import {
   createConversationAndMember,
   getAllConversation,
 } from "../controllers/conversationController";
+
+import {
+  createMessage,
+  getAllMessages,
+} from "../controllers/messageController";
+
 const router = Router();
 
 router.get("/friend", verifyToken, getFriend);
 
 router.post("/addFriend", verifyToken, createConversationAndMember);
 
-router.post("/conversations", verifyToken, getAllConversation);
+router.get("/conversations", verifyToken, getAllConversation);
+
+router.post("/messages", verifyToken, createMessage);
+
+router.get("/messages/:conversationId", verifyToken, getAllMessages);
 
 export default router;

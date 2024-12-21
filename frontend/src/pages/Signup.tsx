@@ -1,22 +1,28 @@
-// import axios from "axios";
-import { useState } from "react";
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
-import {app} from "../config/Firebase";
+import axios, { AxiosError } from "axios";
+import { useEffect, useState } from "react";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  onAuthStateChanged,
+  User as FirebaseUser,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { app } from "../config/Firebase";
 
 export const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
 
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === "email") {
-      setEmail(value);
-    } else if (name === "password") {
-      setPassword(value);
-      
-      setUsername(value);
-    }
+    if (name === "email") setEmail(value);
+    else if (name === "password") setPassword(value);
+    else if (name === "username") setUsername(value);
   };
 
   const handleSignup = async () => {
@@ -27,11 +33,87 @@ export const Signup = () => {
       password
     );
     const user = userCredential.user;
-    sendEmailVerification(user)
-
-
-    console.log(user)
+    setUser(user);
+    await sendEmailVerification(user);
+    console.log("User created in Firebase:", user);
+    console.log("Verification email sent");
   };
+
+  useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user?.emailVerified) {
+        setIsEmailVerified(true);
+        console.log("Email verified");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const createUserInDbIfNeeded = async () => {
+      if (user && isEmailVerified && username) {
+        const token = await user.getIdToken();
+        console.log("Token:", token);
+        try {
+          const response = await axios.post(
+            "http://localhost:3000/api/v1/auth/signup",
+            { id: user.uid, username },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          console.log("User create req sent to DB:", response.data);
+        } catch (error) {
+          console.error(
+            "Error creating user in DB:",
+            (error as AxiosError).response?.data || (error as Error).message
+          );
+        }
+      }
+    };
+    createUserInDbIfNeeded();
+  }, [isEmailVerified]);
+
+  const handleLogin = async () => {
+    const auth = getAuth(app);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+
+    await axios.post(
+      "http://localhost:3000/api/v1/auth/login",
+      {
+        email,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (user && !isEmailVerified) {
+      const checkVerification = setInterval(async () => {
+        await user.reload();
+        console.log("Checking");
+        setIsEmailVerified(user.emailVerified);
+        console.log(user.emailVerified);
+      }, 5000);
+
+      return () => clearInterval(checkVerification);
+    }
+  }, [user, isEmailVerified]);
 
   return (
     <div className="flex flex-col justify-center w-64 h-64 bg-gray-700">
@@ -59,8 +141,22 @@ export const Signup = () => {
         value={password}
         onChange={handleChange}
       />
-      <button className="text-white" onClick={() =>{handleSignup()}}>
+      <button
+        className="text-white"
+        onClick={() => {
+          handleSignup();
+        }}
+      >
         Signup
+      </button>
+      <br /><br />
+      <button
+        className="text-white"
+        onClick={() => {
+          handleLogin();
+        }}
+      >
+        signin
       </button>
     </div>
   );

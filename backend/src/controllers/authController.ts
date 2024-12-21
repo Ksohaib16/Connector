@@ -36,7 +36,7 @@ export const signup: RequestHandler = async (req, res) => {
       avatarUrl: req.body.avatarUrl,
     },
   });
-
+  console.log("User created in DB:", user);
   res.status(200).json({
     message: "User created successfully",
     user,

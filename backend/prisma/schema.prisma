@@ -39,7 +39,7 @@ model Conversation {
 }
 
 model Message {
-  id            String              @id @default(nanoid())
+  id            String              @id @default(cuid())
   content       String
   type          MessageType         @default(TEXT)
   status        MessageStatus       @default(SENT)
