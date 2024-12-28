@@ -1,0 +1,15 @@
+:root {
+  --bg: rgba(33, 33, 33, 1);
+
+  --primary: rgba(56, 116, 201, 1);
+  --secondary: rgb(91, 91, 90);
+
+  --text-primary: rgba(255, 255, 255, 1);
+  --text-secondary: rgba(91, 91, 90, 0.8);
+
+  --card: rgba(33, 33, 33 0.94);
+}
+
+body{
+    background-color: var(--bg);
+}

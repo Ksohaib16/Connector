@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import prisma from "../db/prisma";
+import { CustomError } from "../utility/CustomError";
 
 export const createMessage: RequestHandler = async (req, res) => {
   const senderId = req.user?.uid;
@@ -7,10 +8,7 @@ export const createMessage: RequestHandler = async (req, res) => {
   const { content, conversationId } = req.body;
 
   if (!content || !conversationId) {
-    res
-      .status(400)
-      .json({ message: "content and conversationId are required" });
-    return;
+    throw new CustomError(400, "content and conversationId are required");
   }
 
   const newMessage = await prisma.message.create({
@@ -30,19 +28,21 @@ export const createMessage: RequestHandler = async (req, res) => {
   });
 
   if (!newMessage) {
-    res.status(500).json({ message: "Failed to create message" });
-    return;
+    throw new CustomError(500, "Failed to create message");
   }
 
-  res.status(201).json({ message: "Message created", newMessage });
+  res.status(201).json({
+    status: "success",
+    message: "Message sent",
+    data: { newMessage },
+  });
 };
 
 export const getAllMessages: RequestHandler = async (req, res) => {
   const conversationId = req.params.conversationId;
 
   if (!conversationId) {
-    res.status(400).json({ message: "conversationId is required" });
-    return;
+    throw new CustomError(400, "conversationId is required");
   }
 
   const messages = await prisma.message.findMany({
@@ -54,16 +54,18 @@ export const getAllMessages: RequestHandler = async (req, res) => {
       sender: {
         select: {
           id: true,
-          username: true, 
+          username: true,
         },
       },
     },
   });
 
   if (!messages) {
-    res.status(500).json({ message: "Failed to get messages" });
-    return;
+    throw new CustomError(404, "No messages found");
   }
 
-  res.status(200).json({success:"All messages",messages });
+  res.status(200).json({ 
+    status: "success",
+    data: { messages },
+   });
 };

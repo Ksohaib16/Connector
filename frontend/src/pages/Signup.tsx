@@ -1,98 +1,98 @@
-import axios, { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import axios from "axios";
+import { User, Mail, Lock } from "lucide-react";
+import { AuthHeader } from "../components/AuthHeader";
+import { AuthForm } from "../components/AuthForm";
+import { AuthWrapper } from "../components/wrapper/AuthWrapper";
+import { EmailVerificationModal } from "../components/auth/EmailVerificatinModal";
+import { useState, useEffect } from "react";
+import { validateForm } from "../utility/validateForm";
+import { app } from "../config/Firebase";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   sendEmailVerification,
-  onAuthStateChanged,
-  User as FirebaseUser,
-  signInWithEmailAndPassword,
 } from "firebase/auth";
-import { app } from "../config/Firebase";
+
+const auth = getAuth(app);
+
+const authDetails = {
+  heading: "Sign in to Connector",
+  subHeading: "Please enter your name, email and password",
+};
+
+const inputDetails = [
+  { type: "text", placeholder: "Name", name: "name", icon: User },
+  { type: "text", placeholder: "Email", name: "email", icon: Mail },
+  { type: "password", placeholder: "Password", name: "password", icon: Lock },
+];
+
+interface FormErrors {
+  [key: string]: string;
+}
 
 export const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-
-  const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isVerificationSent, setIsVerificationSent] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (name === "email") setEmail(value);
-    else if (name === "password") setPassword(value);
-    else if (name === "username") setUsername(value);
-  };
-
-  const handleSignup = async () => {
-    const auth = getAuth(app);
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
-    setUser(user);
-    await sendEmailVerification(user);
-    console.log("User created in Firebase:", user);
-    console.log("Verification email sent");
-  };
-
-  useEffect(() => {
-    const auth = getAuth(app);
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user?.emailVerified) {
-        setIsEmailVerified(true);
-        console.log("Email verified");
-      }
+    setFormData((currData) => {
+      return { ...currData, [e.target.name]: e.target.value };
     });
-    return () => unsubscribe();
-  }, []);
+  };
 
   useEffect(() => {
-    const createUserInDbIfNeeded = async () => {
-      if (user && isEmailVerified && username) {
-        const token = await user.getIdToken();
-        console.log("Token:", token);
-        try {
-          const response = await axios.post(
-            "http://localhost:3000/api/v1/auth/signup",
-            { id: user.uid, username },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          console.log("User create req sent to DB:", response.data);
-        } catch (error) {
-          console.error(
-            "Error creating user in DB:",
-            (error as AxiosError).response?.data || (error as Error).message
-          );
+    if (!isVerificationSent) return;
+    let intervalId: number;
+
+    const checkEmailVerified = async () => {
+      console.log("verification check");
+      const user = auth.currentUser;
+      if (user) {
+        await user.reload();
+        if (user.emailVerified) {
+          console.log("Email verified!");
+          setShowModal(false);
+          setIsVerified(true);
+          clearInterval(intervalId);
         }
       }
     };
-    createUserInDbIfNeeded();
-  }, [isEmailVerified]);
 
-  const handleLogin = async () => {
-    const auth = getAuth(app);
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    intervalId = window.setInterval(checkEmailVerified, 5000);
 
-    const user = userCredential.user;
-    const token = await user.getIdToken();
+    return () => clearInterval(intervalId);
+  }, [isVerificationSent]);
 
-    await axios.post(
-      "http://localhost:3000/api/v1/auth/login",
+  useEffect(() => {
+    if (!isVerified) return;
+    const createUserDb = async () => {
+      try {
+        const userData = await createUser(formData.name);
+        console.log(userData);
+      } catch (err) {
+        console.error("error creating user in db", err);
+      }
+    };
+    createUserDb();
+  }, [isVerified]);
+
+  const createUser = async (name: string) => {
+    const user = auth.currentUser;
+    const token = await user?.getIdToken();
+
+    console.log("sending data to api", name, token);
+
+    const response = await axios.post(
+      "http://localhost:3000/api/v1/auth/signup",
       {
-        email,
+        username: name,
       },
       {
         headers: {
@@ -100,64 +100,51 @@ export const Signup = () => {
         },
       }
     );
+    console.log("create req sent to db");
+    const userData = response.data;
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+    });
+    return userData;
+  };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const newErrors = validateForm(formData);
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      console.log("user created in firebase");
+      await sendEmailVerification(userCredential.user);
+      console.log("verification email sent");
+      setIsVerificationSent(true);
+      setShowModal(true);
+    }
   };
 
-  useEffect(() => {
-    if (user && !isEmailVerified) {
-      const checkVerification = setInterval(async () => {
-        await user.reload();
-        console.log("Checking");
-        setIsEmailVerified(user.emailVerified);
-        console.log(user.emailVerified);
-      }, 5000);
-
-      return () => clearInterval(checkVerification);
-    }
-  }, [user, isEmailVerified]);
-
   return (
-    <div className="flex flex-col justify-center w-64 h-64 bg-gray-700">
-      <input
-        className="mb-4 h-8"
-        type="text"
-        placeholder="username"
-        name="username"
-        value={username}
-        onChange={handleChange}
+    <AuthWrapper>
+      <AuthHeader
+        heading={authDetails.heading}
+        subHeading={authDetails.subHeading}
       />
-      <input
-        className="mb-4 h-8"
-        type="text"
-        placeholder="email"
-        name="email"
-        value={email}
-        onChange={handleChange}
+      <AuthForm
+        errors={errors}
+        handleSubmit={handleSubmit}
+        handleChange={handleChange}
+        values={formData}
+        inputDetails={inputDetails}
+        button={"SIGN UP"}
       />
-      <input
-        className="mb-4 h-8"
-        type="text"
-        placeholder="password"
-        name="password"
-        value={password}
-        onChange={handleChange}
-      />
-      <button
-        className="text-white"
-        onClick={() => {
-          handleSignup();
-        }}
-      >
-        Signup
-      </button>
-      <br /><br />
-      <button
-        className="text-white"
-        onClick={() => {
-          handleLogin();
-        }}
-      >
-        signin
-      </button>
-    </div>
+      <div className="text-[#AAAAAA]">
+        Already have an account? <b className="text-[#3874c9]">LOGIN</b>
+      </div>
+      {showModal && <EmailVerificationModal email={formData.email} />}
+    </AuthWrapper>
   );
 };

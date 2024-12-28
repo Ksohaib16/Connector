@@ -1,25 +1,30 @@
 import { RequestHandler } from "express";
 import { translator } from "../llm/llmConfig";
+import { WrapAsync } from "../utility/wrapAsync";
+import { stat } from "fs";
 
+export const inputTranslator: RequestHandler = WrapAsync(async (req, res) => {
+  const { text, from, to } = req.body;
 
-export const inputTranslator: RequestHandler = async(req, res) => {
-    const { text, from, to } = req.body;
+  const translation = await translator(text, { from, to });
+  res.status(200).json({
+    status: "success",
+    message: "Translation successful",
+    data: {
+      translation,
+    },
+  });
+});
 
-    try {
-        const translation = await translator(text, { from, to });
-        res.status(200).json({ translation });
-    } catch (error) {
-        res.status(500).json({ error: (error as any).message });
-    }
-}
+export const chatTranslator: RequestHandler = WrapAsync(async (req, res) => {
+  const { text, from, to } = req.body;
 
-export const chatTranslator: RequestHandler = async(req, res) => {
-    const { text, from, to } = req.body;
-
-    try {
-        const translation = await translator(text, { from, to });
-        res.status(200).json({ translation });
-    } catch (error) {
-        res.status(500).json({ error: (error as any).message });
-    }
-}
+  const translation = await translator(text, { from, to });
+  res.status(200).json({
+    status: "success",
+    message: "Translation successful",
+    data: {
+      translation,
+    },
+  });
+});

@@ -2,20 +2,18 @@ import prisma from "../db/prisma";
 import { verifyToken } from "../firebase-config/firebaseConfig";
 import express, { Request, RequestHandler, Response } from "express";
 import { loginBody, signupBody } from "../models/schemaValidation";
+import { WrapAsync } from "../utility/wrapAsync";
+import { CustomError } from "../utility/CustomError";
 
-export const signup: RequestHandler = async (req, res) => {
+export const signup: RequestHandler = WrapAsync(async (req, res) => {
   const firebaseUser = req.user;
   const result = signupBody.safeParse(req.body);
   if (!firebaseUser?.uid || !firebaseUser?.email) {
-    throw new Error("Firebase user ID or email is undefined");
+    throw new CustomError(401,"Session expired, please login");
   }
 
   if (!result.success) {
-    res.status(400).json({
-      message: "Incorrect inputs",
-      errors: result.error.errors,
-    });
-    return;
+    throw new CustomError(400, "Incorrect inputs",{errors: result.error.errors});
   }
 
   const existingUser = await prisma.user.findUnique({
@@ -25,8 +23,9 @@ export const signup: RequestHandler = async (req, res) => {
   });
 
   if (existingUser) {
-    res.status(400).json({ message: "Email already exists" });
+    throw new CustomError(400, "User already exists");
   }
+
 
   const user = await prisma.user.create({
     data: {
@@ -36,24 +35,21 @@ export const signup: RequestHandler = async (req, res) => {
       avatarUrl: req.body.avatarUrl,
     },
   });
-  console.log("User created in DB:", user);
-  res.status(200).json({
-    message: "User created successfully",
-    user,
-  });
-};
 
-export const login: RequestHandler = async (req, res) => {
+  res.status(200).json({
+    status: "success",
+    data:{user}
+  });
+});
+
+export const login: RequestHandler = WrapAsync( async (req, res) => {
   const firebaseUser = req.user;
   if(!firebaseUser?.uid || !firebaseUser?.email) {
-    throw new Error("Firebase user ID or email is undefined");
+    throw new CustomError(401,"Session expired, please login again");
   }
   const result = loginBody.safeParse(req.body);
   if (!result.success) {
-    res.status(400).json({
-      message: "Incorrect inputs",
-    });
-    return;
+    throw new CustomError(400, "Incorrect inputs",{errors: result.error.errors});
   }
 
   const user = await prisma.user.findUnique({
@@ -63,12 +59,11 @@ export const login: RequestHandler = async (req, res) => {
   });
 
   if(!user){
-    res.status(400).json({message: "User not found" });
-    return;
+    throw new CustomError(401,"User does not exist");
   }
   res.status(200).json({
-    message: "User logged in successfully",
-    user,
+    status: "success",
+    data:{user}
   })
 
-};
+});
