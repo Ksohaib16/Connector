@@ -1,0 +1,10 @@
+.home-container {
+    display: grid;
+    grid-template-columns: 1fr;  /* Mobile default: single column */
+  }
+  
+  @media (min-width: 768px) {
+    .home-container {
+      grid-template-columns: 1fr 2fr;  /* Desktop: 1:2 ratio */
+    }
+  }

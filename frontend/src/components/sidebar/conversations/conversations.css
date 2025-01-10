@@ -1,0 +1,7 @@
+.conversations {
+    flex: 1;
+    overflow: auto;
+    padding: 0 0.75rem;
+    margin-top: 0.5rem;
+  }
+  

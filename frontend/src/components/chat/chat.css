@@ -1,0 +1,114 @@
+.chat {
+  background-color: black;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.chat-navbar {
+  display: flex;
+  background-color: var(--bg);
+  align-items: center;
+  display: flex;
+  height: 90px;
+  gap: 1rem;
+  padding: 0.25rem;
+}
+.chat-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0.25rem 0;
+  flex: 1;
+}
+
+.conversation-title {
+  display: flex;
+  flex: 1;
+  font-size: 1.5rem;
+  align-items: center;
+}
+
+.chat-status {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  color: var(--text-secondary);
+}
+.messages {
+  flex: 1;
+  overflow: auto;
+  padding: 0 0.75rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.message-input {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100px;
+  background-color: transparent;
+}
+
+.input-box {
+  display: flex;
+  background-color: var(--bg);
+  align-items: center;
+  flex: 1;
+  padding: 0 1rem 0 0.75rem;
+  border-radius: 25px;
+}
+
+input {
+  background-color: var(--bg);
+  padding: 1rem 0.5rem;
+  border-radius: 25px;
+  width: 100%;
+  outline: none;
+  color: var(--text-primary);
+}
+
+input::placeholder {
+  color: var(--text-secondary);
+}
+.send-btn {
+  width: 55px; /* Fixed width */
+  height: 55px; /* Fixed height */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg);
+  margin-left: 0.5rem;
+}
+
+.send-btn:hover {
+  background-color: var(--primary);
+}
+
+.send-btn-icon {
+  color: var(--primary);
+}
+
+.send-btn-icon:hover {
+  color: var(--text-primary);
+}
+
+.AI-modal {
+  position: absolute;
+  left: calc(55% + ((100vw - 320px) * 0.45));
+  top: 68%;
+  transform: translate(-50%, 50%);
+  z-index: 1000;
+}
+
+.conversation-setting {
+  position: absolute;
+  z-index: 1000;
+  left: calc(58% + ((100vw - 320px) * 0.40));
+  top: -10%;
+  transform: translate(-50%, 50%);
+}

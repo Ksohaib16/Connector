@@ -1,0 +1,22 @@
+.modal-option {
+  display: flex;
+  font-weight: 400;
+  gap: 15px;
+  padding: 0.75rem 0.5rem;
+  align-items: center;
+  white-space: nowrap;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &.danger {
+    .option {
+      color: red;
+    }
+  }
+}
+.modal-option:hover{
+  background-color: var(--search);
+}
+.icon {
+  color: #aaaaaa;
+}

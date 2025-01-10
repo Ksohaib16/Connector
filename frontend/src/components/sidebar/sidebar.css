@@ -1,0 +1,16 @@
+.sidebar {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  border-right: 0.5px solid var(--text-secondary);
+}
+
+.profile-modal{
+  position: relative;
+  top: -62%;        /* Change these values */
+  left: 55%;       /* to position anywhere */
+  transform: translate(-50%, -50%);
+  z-index: 1000;   /* Make sure modal stays on top */
+  border-radius: 10px;
+}
+

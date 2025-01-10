@@ -1,0 +1,14 @@
+/* styles.css */
+.custom-toast-container {
+  background-color: #212121 !important;
+  color: var(--primary) !important;
+  border-radius: 8px;
+}
+
+.custom-toast-body {
+  color: var(--primary) !important;
+}
+
+.custom-progress-bar {
+  background: var(--primary) !important;
+}
