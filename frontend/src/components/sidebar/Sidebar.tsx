@@ -54,7 +54,7 @@ export const Sidebar = () => {
           setIsLoading(true);
           const token = await user.getIdToken();
           const response = await axios.get(
-            `${config.API_URL}api/v1/user/conversations`,            {
+            `${config.API_URL}/api/v1/user/conversations`,            {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -86,7 +86,7 @@ export const Sidebar = () => {
       const token = await auth.currentUser?.getIdToken();
 
       const response = await axios.post(
-        `${config.API_URL}api/v1/user/friend`,
+        `${config.API_URL}/api/v1/user/friend`,
         {
           email: search,
         },
@@ -110,7 +110,7 @@ export const Sidebar = () => {
       const token = await auth.currentUser?.getIdToken();
 
       const response = await axios.post(
-        `${config.API_URL}api/v1/user/addFriend`,
+        `${config.API_URL}/api/v1/user/addFriend`,
         {
           email: email,
           id,

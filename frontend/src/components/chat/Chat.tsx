@@ -107,7 +107,7 @@ export const Chat = ({
       if (!currConversation?.id) return;
       const token = await auth.currentUser?.getIdToken();
       const response = await axios.get(
-        `${config.API_URL}api/v1/user/messages/${currConversation.id}`,
+        `${config.API_URL}/api/v1/user/messages/${currConversation.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -135,7 +135,7 @@ export const Chat = ({
     sendFunc(websocketData);
     try {
       const response = await axios.post(
-        `${config.API_URL}api/v1/user/messages`,
+        `${config.API_URL}/api/v1/user/messages`,
         {
           content,
           conversationId: currConversation?.id,
@@ -167,7 +167,7 @@ export const Chat = ({
     try {
       setIsTranslating(true);
       const response = await axios.post(
-        `${config.API_URL}api/v1/translate/inputtext`,
+        `${config.API_URL}/api/v1/translate/inputtext`,
         {
           text: content,
           from: `${translationSetting?.from}`,
