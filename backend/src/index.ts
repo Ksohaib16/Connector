@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT: number = 3000;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 app.get("/", async (req: Request, res: Response): Promise<void> => {
   res.send("Hello world");

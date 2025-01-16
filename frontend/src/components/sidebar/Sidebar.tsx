@@ -28,6 +28,7 @@ import { setUser } from "../../redux/userSlice";
 import { RootState } from "../../redux/store";
 import { Conversation } from "./conversations/Conversation";
 import { Loader } from "../loader/Loader";
+import { config } from "../../config/api.config";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -53,8 +54,7 @@ export const Sidebar = () => {
           setIsLoading(true);
           const token = await user.getIdToken();
           const response = await axios.get(
-            "http://localhost:3000/api/v1/user/conversations",
-            {
+            `${config.API_URL}/user/conversations`,            {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -86,7 +86,7 @@ export const Sidebar = () => {
       const token = await auth.currentUser?.getIdToken();
 
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/friend",
+        `${config.API_URL}/user/friend`,
         {
           email: search,
         },
@@ -110,7 +110,7 @@ export const Sidebar = () => {
       const token = await auth.currentUser?.getIdToken();
 
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/addFriend",
+        `${config.API_URL}/user/addFriend`,
         {
           email: email,
           id,

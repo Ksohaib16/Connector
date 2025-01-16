@@ -32,7 +32,7 @@ export const AuthForm = ({
     password: string
   };
   errors: FormError;
-  isLoggin: boolean
+  isLoggin?: boolean
 }) => {
   return (
     <div className="auth-form w-full">
@@ -48,7 +48,7 @@ export const AuthForm = ({
             onChange={handleChange}
           />
         ))}
-        <Button isLoggingIn={isLoggin} text={button} />
+        <Button isLoggingIn={isLoggin ?? false} text={button as string} />
       </form>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { config } from "../config/api.config";
 
 export const useWebSocket = (
   onMessageCallback?: (data: any) => void,
@@ -30,7 +31,7 @@ export const useWebSocket = (
   useEffect(() => {
     console.log("Initializing WebSocket connection");
 
-    ws.current = new WebSocket("ws://localhost:8080");
+    ws.current = new WebSocket(`${config.WS_URL}`);
 
     ws.current.onopen = () => {
       console.log("Connected to the server");

@@ -12,6 +12,7 @@ import { setUser } from "../redux/userSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { MainWrapper } from "../components/wrapper/MainWrapper";
 import { ContentWrapper } from "../components/wrapper/ContentWrapper";
+import { config } from "../config/api.config";
 
 const auth = getAuth(app);
 
@@ -53,8 +54,7 @@ export const Login = () => {
     const token = await user?.getIdToken();
 
     const response = await axios.post(
-      "http://localhost:3000/api/v1/auth/login",
-      {
+      `${config.API_URL}/auth/login`,      {
         email,
       },
       {

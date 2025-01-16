@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User, Mail, Lock, File } from "lucide-react";
+import { User, Mail, Lock } from "lucide-react";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthForm } from "../components/AuthForm";
 import { AuthWrapper } from "../components/wrapper/AuthWrapper";
@@ -18,6 +18,7 @@ import { setUser } from "../redux/userSlice";
 import { ContentWrapper } from "../components/wrapper/ContentWrapper";
 import { MainWrapper } from "../components/wrapper/MainWrapper";
 import { upload } from "../utility/upload";
+import { config } from "../config/api.config";
 
 const auth = getAuth(app);
 
@@ -56,7 +57,6 @@ export const Signup = () => {
   const [isVerificationSent, setIsVerificationSent] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
-  const [isSignupIn, setIsSignupIn] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -68,7 +68,7 @@ export const Signup = () => {
 
   useEffect(() => {
     if (!isVerificationSent) return;
-    let intervalId: number;
+    // const intervalId: NodeJS.Timer;
 
     const checkEmailVerified = async () => {
       const user = auth.currentUser;
@@ -82,8 +82,7 @@ export const Signup = () => {
         }
       }
     };
-
-    intervalId = window.setInterval(checkEmailVerified, 5000);
+    const intervalId = window.setInterval(checkEmailVerified, 5000);
 
     return () => clearInterval(intervalId);
   }, [isVerificationSent]);
@@ -110,7 +109,7 @@ export const Signup = () => {
     console.log("sending data to api", name, token);
 
     const response = await axios.post(
-      "http://localhost:3000/api/v1/auth/signup",
+      `${config.API_URL}/auth/signup`,
       {
         avatarUrl: imageUrl,
         username: name,
@@ -187,7 +186,6 @@ export const Signup = () => {
             values={formData}
             inputDetails={inputDetails}
             button={"SIGN UP"}
-            isLoggin={isSignupIn}
           />
           <div className="text-[#AAAAAA]">
             Already have an account?&nbsp;

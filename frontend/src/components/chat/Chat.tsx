@@ -30,6 +30,7 @@ import { ModalOption } from "../shared/ModalOption";
 import { TranslationSettingModal } from "../modal/TranslationSettingModal";
 import { setTranslationSetting } from "../../redux/llmSlice";
 import { Loader } from "../loader/Loader";
+import { config } from "../../config/api.config";
 
 const auth = getAuth();
 
@@ -106,7 +107,7 @@ export const Chat = ({
       if (!currConversation?.id) return;
       const token = await auth.currentUser?.getIdToken();
       const response = await axios.get(
-        `http://localhost:3000/api/v1/user/messages/${currConversation.id}`,
+        `${config.API_URL}/user/messages/${currConversation.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -134,7 +135,7 @@ export const Chat = ({
     sendFunc(websocketData);
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/messages",
+        `${config.API_URL}/user/messages`,
         {
           content,
           conversationId: currConversation?.id,
@@ -166,7 +167,7 @@ export const Chat = ({
     try {
       setIsTranslating(true);
       const response = await axios.post(
-        "http://localhost:3000/api/v1/translate/inputtext",
+        `${config.API_URL}/translate/inputtext`,
         {
           text: content,
           from: `${translationSetting?.from}`,
