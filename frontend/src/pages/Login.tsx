@@ -54,7 +54,7 @@ export const Login = () => {
     const token = await user?.getIdToken();
 
     const response = await axios.post(
-      `${config.API_URL}/auth/login`,      {
+      `${config.API_URL}api/v1/auth/login`,      {
         email,
       },
       {

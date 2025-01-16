@@ -7,7 +7,14 @@ import cors from "cors";
 import { error } from "console";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://connector-five.vercel.app/',
+    "https://connector-sohaibs-projects-1c7baf9c.vercel.app/",
+    'http://localhost:5173',  // for local development
+  ],
+  credentials: true  // if you're using cookies/sessions
+}));
 app.use(express.json());
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;

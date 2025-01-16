@@ -109,7 +109,7 @@ export const Signup = () => {
     console.log("sending data to api", name, token);
 
     const response = await axios.post(
-      `${config.API_URL}/auth/signup`,
+      `${config.API_URL}api/v1/auth/signup`,
       {
         avatarUrl: imageUrl,
         username: name,
