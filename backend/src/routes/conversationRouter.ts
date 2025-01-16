@@ -13,7 +13,7 @@ import {
 
 const router = Router();
 
-router.get("/friend", verifyToken, getFriend);
+router.post("/friend", verifyToken, getFriend);
 
 router.post("/addFriend", verifyToken, createConversationAndMember);
 

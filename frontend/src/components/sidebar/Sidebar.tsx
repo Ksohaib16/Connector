@@ -1,10 +1,16 @@
 import "./sidebar.css";
 import "./navbar/navbar.css";
-import { Conversations } from "./conversations/Conversations";
+import "./conversations/conversation.css";
 import { ModalWrapper } from "../wrapper/ModalWrapper";
 import { ModalOption } from "../shared/ModalOption";
 import { useState, useEffect } from "react";
-import { LogOut, Menu, SunMoon, ToggleRight, UserPen } from "lucide-react";
+import {
+  LogOut,
+  Menu,
+  SunMoon,
+  ToggleRight,
+  UserPen,
+} from "lucide-react";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 const auth = getAuth();
@@ -15,9 +21,13 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addConversation,
   setConversations,
+  setCurrConversation,
 } from "../../redux/conversationSlice";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../../redux/userSlice";
+import { RootState } from "../../redux/store";
+import { Conversation } from "./conversations/Conversation";
+import { Loader } from "../loader/Loader";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -31,13 +41,16 @@ export const Sidebar = () => {
 
   const [friendModal, setFriendModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const conversations = useSelector(
-    (state) => state.conversation.conversations
+    (state: RootState) => state.conversation.conversations
   );
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
+          setIsLoading(true);
           const token = await user.getIdToken();
           const response = await axios.get(
             "http://localhost:3000/api/v1/user/conversations",
@@ -47,9 +60,12 @@ export const Sidebar = () => {
               },
             }
           );
+          console.log(response.data.data.userConversation);
           dispatch(setConversations(response.data.data.userConversation));
         } catch (error) {
           console.error("Error fetching conversations:", error);
+        } finally {
+          setIsLoading(false);
         }
       } else {
         console.log("No user is signed in");
@@ -64,7 +80,6 @@ export const Sidebar = () => {
   const email = friend.email;
   const id = friend.id;
   const avatarUrl = friend.avatarUrl;
-  console.log(friend);
 
   const handleSearch = async (search: string) => {
     try {
@@ -95,7 +110,7 @@ export const Sidebar = () => {
       const token = await auth.currentUser?.getIdToken();
 
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/add",
+        "http://localhost:3000/api/v1/user/addFriend",
         {
           email: email,
           id,
@@ -118,20 +133,24 @@ export const Sidebar = () => {
     setFriendModal(false);
   };
 
-  if (!conversations) {
-    return <div>Loading...</div>;
-  }
+  const handleSelectConversation = async (conversation, frndUser) => {
+    dispatch(setCurrConversation({ conversation, frndUser }));
+    console.log(conversation, frndUser);
+  };
 
   const handleLogout = () => {
     auth.signOut();
-    dispatch(setUser(null))
+    dispatch(setUser(null));
     navigate("/login");
-  }
+  };
 
   return (
     <div className="sidebar">
       <div className="navbar">
-        <div className="menu-btn" onClick={() => setShowProfileModal(!showProfileModal)}>
+        <div
+          className="menu-btn"
+          onClick={() => setShowProfileModal(!showProfileModal)}
+        >
           <Menu
             style={{ cursor: "pointer" }}
             color="#AAAAAA"
@@ -141,17 +160,29 @@ export const Sidebar = () => {
         </div>
         <SearchBox handleSearch={handleSearch} />
       </div>
-      <div className="conversations">
-        {friendModal && (
-          <AddFriendModal
-            name={name}
-            email={email}
-            avatarUrl={avatarUrl}
-            handleAdd={handleAdd}
-          />
-        )}
-        <Conversations conversations={conversations} />
-      </div>
+      {isLoading ? (
+        <div className="isLoading">
+          <Loader size={20} />
+        </div>
+      ) : (
+        <div className="conversations">
+          {friendModal && (
+            <AddFriendModal
+              name={name}
+              email={email}
+              avatarUrl={avatarUrl}
+              handleAdd={handleAdd}
+            />
+          )}
+          {conversations.map((conversation) => (
+            <Conversation
+              key={conversation.id}
+              conversation={conversation}
+              onSelectConversation={handleSelectConversation}
+            />
+          ))}
+        </div>
+      )}
       {showProfileModal && (
         <div className="profile-modal">
           <ModalWrapper>
@@ -161,7 +192,12 @@ export const Sidebar = () => {
               option={"Dark Mode"}
               switch={ToggleRight}
             />
-            <ModalOption handleClick={handleLogout} icon={LogOut} option={"Logout"} className={"danger"} />
+            <ModalOption
+              handleClick={handleLogout}
+              icon={LogOut}
+              option={"Logout"}
+              className={"danger"}
+            />
           </ModalWrapper>
         </div>
       )}

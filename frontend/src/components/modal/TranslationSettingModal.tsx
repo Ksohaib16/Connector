@@ -1,23 +1,28 @@
 import { useState } from "react";
 import "./TranslationSettingModal.css";
 import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 export const TranslationSettingModal = ({
   handleClick,
 }: {
-  handleClick: (conversationId: string,from: string, to: string) => void;
+  handleClick: ({ conversationId, from, to }: { 
+    conversationId: string, 
+    from: string, 
+    to: string 
+  }) => void;
 }) => {
   const [from, setFrom] = useState("Auto-Detect");
   const [to, setTo] = useState("English");
-  const conversationId = useSelector((state: any) => state.conversation.currConversation?.id);
+  const conversationId = useSelector(
+    (state: RootState) => state.conversation.currConversation?.id
+  );
 
   const handleFrom = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFrom(e.target.value);
-    console.log(e.target.value);
   };
 
   const handleTo = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTo(e.target.value);
-    console.log(e.target.value);
   };
 
   return (
@@ -54,9 +59,7 @@ export const TranslationSettingModal = ({
               value={to}
               onChange={handleTo}
             >
-              <option value="English">
-                English
-              </option>
+              <option value="English">English</option>
               <option value="Spanish">Spanish</option>
               <option value="Hinglish">Hinglish</option>
               <option value="Marathi">Marathi</option>
@@ -64,7 +67,9 @@ export const TranslationSettingModal = ({
             </select>
           </div>
         </div>
-        <button onClick={() => handleClick(conversationId,from, to)}>Save Changes</button>
+        <button onClick={() => handleClick({conversationId, from, to})}>
+          Save Changes
+        </button>
       </div>
     </div>
   );

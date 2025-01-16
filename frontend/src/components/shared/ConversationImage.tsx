@@ -1,6 +1,6 @@
 import "./conversationImage.css"
-export const ConversationImage = () => {
+export const ConversationImage = ({frndImg}) => {
     return(
-            <img src="/hero.jpg" alt="" />
+            <img src={frndImg} alt="" />
     )
 }

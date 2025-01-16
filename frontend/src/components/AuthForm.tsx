@@ -1,7 +1,6 @@
 import { Input } from "./shared/Input";
 import { LucideIcon } from "lucide-react";
 import { Button } from "./shared/Button";
-// types/auth.ts
 export interface FormError {
   [key: string]: string;
 }
@@ -11,7 +10,7 @@ interface InputDetail {
   placeholder: string;
   name: string;
   icon: LucideIcon;
-  errors: FormError;
+  errors?: FormError;
 }
 
 export const AuthForm = ({
@@ -21,17 +20,19 @@ export const AuthForm = ({
   handleChange,
   inputDetails,
   button,
+  isLoggin,
 }: {
   inputDetails: InputDetail[];
   button: string;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   values: {
-    name: string;
+    name?: string;
     email: string;
     password: string
   };
   errors: FormError;
+  isLoggin: boolean
 }) => {
   return (
     <div className="auth-form w-full">
@@ -47,7 +48,7 @@ export const AuthForm = ({
             onChange={handleChange}
           />
         ))}
-        <Button text={button} />
+        <Button isLoggingIn={isLoggin} text={button} />
       </form>
     </div>
   );

@@ -3,18 +3,20 @@ import { Mail, Lock } from "lucide-react";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthForm } from "../components/AuthForm";
 import { AuthWrapper } from "../components/wrapper/AuthWrapper";
-import { useState, useEffect } from "react";
-import { validateLoginForm, validateFormPassword } from "../utility/validateForm";
+import { useState } from "react";
+import { validateLoginForm } from "../utility/validateForm";
 import { app } from "../config/Firebase";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/userSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { MainWrapper } from "../components/wrapper/MainWrapper";
+import { ContentWrapper } from "../components/wrapper/ContentWrapper";
 
 const auth = getAuth(app);
 
 const authDetails = {
-  heading: "Login to Connector",
+  heading: "Connector",
   subHeading: "Please confirm you email and password",
 };
 
@@ -27,28 +29,32 @@ interface FormErrors {
   [key: string]: string;
 }
 
+//function
 export const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((currData) => {
       return { ...currData, [e.target.name]: e.target.value };
     });
-    setErrors({})
+    setErrors({});
   };
 
   const loginUser = async (email: string) => {
     const user = auth.currentUser;
     const token = await user?.getIdToken();
 
-    console.log("sending data to api",token);
-
     const response = await axios.post(
-      "http://localhost:3000/api/v1/auth/login",{
+      "http://localhost:3000/api/v1/auth/login",
+      {
         email,
       },
       {
@@ -65,51 +71,63 @@ export const Login = () => {
     return userData;
   };
 
-
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newErrors = validateLoginForm(formData);
-    console.log("newError", newErrors)
+    console.log("newError", newErrors);
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       try {
+        setIsLoggingIn(true);
         await signInWithEmailAndPassword(
           auth,
           formData.email,
           formData.password
         );
-  
+
         const userData = await loginUser(formData.email);
         if (!userData) {
           return;
         }
-        console.log(userData, userData.status)
+        console.log(userData, userData.status);
+        dispatch(setUser(userData.data.user));
+        navigate("/home");
       } catch {
-        setErrors(prev => ({
+        setErrors((prev) => ({
           ...prev,
-          password: "Invalid email or password"
+          password: "Invalid email or password",
         }));
+      } finally {
+        setIsLoggingIn(false);
       }
     }
   };
 
   return (
-    <AuthWrapper>
-      <AuthHeader
-        heading={authDetails.heading}
-        subHeading={authDetails.subHeading}
-      />
-      <AuthForm
-        errors={errors}
-        handleSubmit={handleSubmit}
-        handleChange={handleChange}
-        values={formData}
-        inputDetails={inputDetails}
-        button={"SIGN UP"}
-      />
-      <div className="text-[#AAAAAA]">
-        Don't have an account? <b className="text-[#3874c9]">SIGNUP</b>
-      </div>
-    </AuthWrapper>
+    <MainWrapper>
+      <ContentWrapper>
+        <AuthWrapper>
+          <AuthHeader
+            heading={authDetails.heading}
+            subHeading={authDetails.subHeading}
+          />
+          <AuthForm
+            errors={errors}
+            handleSubmit={handleSubmit}
+            handleChange={handleChange}
+            values={formData}
+            inputDetails={inputDetails}
+            button={"SIGN UP"}
+            isLoggin={isLoggingIn}
+          />
+          <div className="text-[#AAAAAA]">
+            Don't have an account? &nbsp;{" "}
+            <b className="text-[#3874c9]">
+              <Link to="/signup">Sign up</Link>
+            </b>
+          </div>
+        </AuthWrapper>
+      </ContentWrapper>
+    </MainWrapper>
   );
 };

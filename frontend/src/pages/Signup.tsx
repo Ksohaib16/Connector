@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, File } from "lucide-react";
 import { AuthHeader } from "../components/AuthHeader";
 import { AuthForm } from "../components/AuthForm";
 import { AuthWrapper } from "../components/wrapper/AuthWrapper";
@@ -7,16 +7,22 @@ import { EmailVerificationModal } from "../components/auth/EmailVerificatinModal
 import { useState, useEffect } from "react";
 import { validateForm } from "../utility/validateForm";
 import { app } from "../config/Firebase";
+import { useDispatch } from "react-redux";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
+import { Link, useNavigate } from "react-router-dom";
+import { setUser } from "../redux/userSlice";
+import { ContentWrapper } from "../components/wrapper/ContentWrapper";
+import { MainWrapper } from "../components/wrapper/MainWrapper";
+import { upload } from "../utility/upload";
 
 const auth = getAuth(app);
 
 const authDetails = {
-  heading: "Sign in to Connector",
+  heading: "Connector",
   subHeading: "Please enter your name, email and password",
 };
 
@@ -30,16 +36,29 @@ interface FormErrors {
   [key: string]: string;
 }
 
+interface Avatar {
+  url: string;
+  file: File | null;
+}
+
 export const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  const [avatar, setAvatar] = useState<Avatar>({
+    url: "",
+    file: null,
+  });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isVerificationSent, setIsVerificationSent] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [isSignupIn, setIsSignupIn] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((currData) => {
@@ -52,14 +71,13 @@ export const Signup = () => {
     let intervalId: number;
 
     const checkEmailVerified = async () => {
-      console.log("verification check");
       const user = auth.currentUser;
       if (user) {
         await user.reload();
         if (user.emailVerified) {
-          console.log("Email verified!");
-          setShowModal(false);
           setIsVerified(true);
+          setShowModal(false);
+
           clearInterval(intervalId);
         }
       }
@@ -75,7 +93,8 @@ export const Signup = () => {
     const createUserDb = async () => {
       try {
         const userData = await createUser(formData.name);
-        console.log(userData);
+        dispatch(setUser(userData.data.user));
+        navigate("/home");
       } catch (err) {
         console.error("error creating user in db", err);
       }
@@ -86,12 +105,14 @@ export const Signup = () => {
   const createUser = async (name: string) => {
     const user = auth.currentUser;
     const token = await user?.getIdToken();
-
+    const imageUrl = await upload(avatar.file!);
+    console.log(imageUrl);
     console.log("sending data to api", name, token);
 
     const response = await axios.post(
       "http://localhost:3000/api/v1/auth/signup",
       {
+        avatarUrl: imageUrl,
         username: name,
       },
       {
@@ -100,7 +121,6 @@ export const Signup = () => {
         },
       }
     );
-    console.log("create req sent to db");
     const userData = response.data;
     setFormData({
       name: "",
@@ -119,32 +139,65 @@ export const Signup = () => {
         formData.email,
         formData.password
       );
-      console.log("user created in firebase");
       await sendEmailVerification(userCredential.user);
-      console.log("verification email sent");
       setIsVerificationSent(true);
       setShowModal(true);
     }
   };
 
   return (
-    <AuthWrapper>
-      <AuthHeader
-        heading={authDetails.heading}
-        subHeading={authDetails.subHeading}
-      />
-      <AuthForm
-        errors={errors}
-        handleSubmit={handleSubmit}
-        handleChange={handleChange}
-        values={formData}
-        inputDetails={inputDetails}
-        button={"SIGN UP"}
-      />
-      <div className="text-[#AAAAAA]">
-        Already have an account? <b className="text-[#3874c9]">LOGIN</b>
-      </div>
-      {showModal && <EmailVerificationModal email={formData.email} />}
-    </AuthWrapper>
+    <MainWrapper>
+      <ContentWrapper>
+        <AuthWrapper>
+          <AuthHeader
+            heading={authDetails.heading}
+            subHeading={authDetails.subHeading}
+          />
+          <div className="relative mb-[1.5rem] w-full flex items-center justify-between px-2">
+            <img
+              className="w-16 h-16 rounded-full object-cover"
+              src={avatar.url || "/avatar.png"}
+              alt=""
+            />
+            <label
+              className="text-[var(--primary)] font-medium underline cursor-pointer"
+              htmlFor="avatar"
+            >
+              Upload Profile
+            </label>
+            <input
+              style={{ display: "none" }}
+              type="file"
+              id="avatar"
+              onChange={(e) => {
+                const avtarFile = e.target.files?.[0];
+                if (avtarFile) {
+                  setAvatar({
+                    url: URL.createObjectURL(avtarFile),
+                    file: avtarFile,
+                  });
+                }
+              }}
+            />
+          </div>
+          <AuthForm
+            errors={errors}
+            handleSubmit={handleSubmit}
+            handleChange={handleChange}
+            values={formData}
+            inputDetails={inputDetails}
+            button={"SIGN UP"}
+            isLoggin={isSignupIn}
+          />
+          <div className="text-[#AAAAAA]">
+            Already have an account?&nbsp;
+            <b className="text-[#3874c9]">
+              <Link to="/login">Login</Link>
+            </b>
+          </div>
+          {showModal && <EmailVerificationModal email={formData.email} />}
+        </AuthWrapper>
+      </ContentWrapper>
+    </MainWrapper>
   );
 };

@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 export const useWebSocket = (
-  onMessageCallback?: (data: any) => void, // Made optional
-  onNotificationCallback?: (data: any) => void // Made optional
+  onMessageCallback?: (data: any) => void,
+  onNotificationCallback?: (data: any) => void 
 ) => {
   const currConversation = useSelector(
     (state) => state.conversation.currConversation
@@ -59,7 +59,7 @@ export const useWebSocket = (
             return;
           }
           const isSenderInConversation = currConversation.members.some(
-            (member) => member.userId === parsedData.data.senderId
+            (member) => member.user.id === parsedData.data.senderId
           );
           if (!isSenderInConversation) {
             onNotificationCallback?.(parsedData.data);

@@ -3,37 +3,29 @@ import { ConversationImage } from "../../shared/ConversationImage";
 import { ConversationTitle } from "../../shared/ConversationTitle";
 import "./conversation.css";
 import { format, isThisWeek, isToday, isYesterday } from "date-fns";
+import { RootState } from "../../../redux/store";
 
-const dateFormater = (date) => {
+const dateFormater = (date: string) => {
   if (isToday(date)) {
     return `${format(date, "HH: MM a")}`;
   } else if (isYesterday(date)) {
-    return `Yesterday ${format(date, "HH: MM a")}`;
+    return `Yesterday`;
   } else if (isThisWeek(date)) {
-    return `${format(date, "EEEE HH: MM a")}`;
+    return `${format(date, "EEEE")}`;
   } else {
-    return `${format(date, "dd/MM/yyyy HH: MM a")}`;
+    return `${format(date, "dd/MM/yyyy")}`;
   }
 };
 
-export const Conversation = ({ conversation, onSelectConversation }) => {
-  
-  if (!conversation || !conversation.members) {
-    return <div>No conversation found</div>;
-  }
-
-  const currUser = useSelector((state) => state.user.currUser);
-  const currUserId = currUser.id;
+export const Conversation = ({ conversation, onSelectConversation }:{conversation: any, onSelectConversation: any}) => {
+  const currUser = useSelector((state: RootState) => state.user.currUser);
 
   const frndUser = conversation.members.find(
-    (member) => member.userId !== currUserId
+    (member) => member.user.id !== currUser?.id
   );
 
-  if (!frndUser) {
-    return <div>No friend found</div>;
-  }
-
   const frndName = frndUser.user.username;
+  console.log("Friend name is ", frndName);
   return (
     <div
       className="conversation"
@@ -42,7 +34,7 @@ export const Conversation = ({ conversation, onSelectConversation }) => {
       }}
     >
       <div className="conversation-img">
-        <ConversationImage />
+        <ConversationImage frndImg={frndUser.user.avatarUrl} />
       </div>
       <div className="conversation-info-container">
         <div className="conversation-info">

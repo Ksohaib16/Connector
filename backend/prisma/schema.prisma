@@ -30,12 +30,14 @@ model Conversation {
   id            String              @id @default(nanoid())
   members       ConversationMember[]
   messages      Message[]
-  lastMessageId String?             
-  lastMessage   Message?            @relation("LastMessage", references: [id], fields: [lastMessageId])
+ lastMessageContent String?
+ lastMessageSenderId String?
+ lastMessageTime DateTime?
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
-  @@index([lastMessageId])
+ @@index([updatedAt, id])
+ @@index([lastMessageTime])
 }
 
 model Message {
@@ -44,13 +46,9 @@ model Message {
   type          MessageType         @default(TEXT)
   status        MessageStatus       @default(SENT)
   senderId      String
-  // This connects to the sender (User)
   sender        User                @relation(fields: [senderId], references: [id])
   conversationId String
-  // This connects to the conversation this message belongs to
   conversation  Conversation        @relation(fields: [conversationId], references: [id])
-  // This is for the lastMessage relation in Conversation
-  lastMessageFor Conversation[]     @relation("LastMessage")
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 

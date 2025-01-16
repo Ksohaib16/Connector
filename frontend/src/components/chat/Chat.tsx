@@ -29,30 +29,40 @@ import { ModalWrapper } from "../wrapper/ModalWrapper";
 import { ModalOption } from "../shared/ModalOption";
 import { TranslationSettingModal } from "../modal/TranslationSettingModal";
 import { setTranslationSetting } from "../../redux/llmSlice";
+import { Loader } from "../loader/Loader";
 
 const auth = getAuth();
 
-export const Chat = ({handleCurrConversation}: {handleCurrConversation: () => void}) => {
+export const Chat = ({
+  handleCurrConversation,
+}: {
+  handleCurrConversation: () => void;
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
   const frndUser = useSelector(
     (state: RootState) => state.conversation.frndUser
   );
-  const frndName = frndUser?.user?.username;
-  const [messages, setMessages] = useState([]);
-  const [content, setContent] = useState("");
   const currConversation = useSelector(
     (state: RootState) => state.conversation.currConversation
   );
-  console.log("current conversation", currConversation);
+
+  const frndName = frndUser?.user?.username;
+  const frndImg = frndUser?.user?.avatarUrl;
+
+  const [messages, setMessages] = useState([]);
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const currConversationId = currConversation?.id;
   const translationSetting = useSelector(
     (state: RootState) =>
       state.translator.translationSetting[currConversationId || ""]
   );
   const notification = useSelector(
-    (state) => state.conversation.notificationCount[currConversationId || ""]
+    (state: RootState) =>
+      state.conversation.notificationCount[currConversationId || ""]
   );
   const [showTranslationModal, setShowTranslationModal] = useState(false);
   const [showConversationSetting, setShowConversationSetting] = useState(false);
@@ -106,11 +116,12 @@ export const Chat = ({handleCurrConversation}: {handleCurrConversation: () => vo
       setMessages(response.data.data.messages);
     };
     getAllMessages();
-  }, [currConversation.id]);
+  }, [currConversation?.id]);
 
   const handleSend = async (content: any) => {
     const token = await auth.currentUser?.getIdToken();
     const receiverId = frndUser?.user?.id;
+    setIsLoading(true);
     const websocketData = {
       type: "message",
       data: {
@@ -121,39 +132,39 @@ export const Chat = ({handleCurrConversation}: {handleCurrConversation: () => vo
       },
     };
     sendFunc(websocketData);
-
-    const response = await axios.post(
-      "http://localhost:3000/api/v1/user/messages",
-      {
-        content,
-        conversationId: currConversation?.id,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/user/messages",
+        {
+          content,
+          conversationId: currConversation?.id,
         },
-      }
-    );
-    setMessages((prev) => [...prev, response.data.data.newMessage]);
-
-    console.log(
-      "responsefrom conversation api ",
-      response.data.data.updatedConversation
-    );
-    dispatch(updateConversation(response.data.data.updatedConversation));
-    console.log("translationSetting", translationSetting);
-    console.log("notifacaiton", notification);
-    setContent("");
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMessages((prev) => [...prev, response.data.data.newMessage]);
+      dispatch(updateConversation(response.data.data.updatedConversation));
+      console.log("translationSetting", translationSetting);
+      console.log("notifacaiton", notification);
+      setContent("");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleTranslationModal = async () => {
-    console.log("clicked");
+  const handleInputTranslate = async () => {
     setShowAI(!showAI);
     try {
+      setIsTranslating(true);
       const response = await axios.post(
         "http://localhost:3000/api/v1/translate/inputtext",
         {
@@ -162,32 +173,45 @@ export const Chat = ({handleCurrConversation}: {handleCurrConversation: () => vo
           to: `${translationSetting?.to}`,
         }
       );
-      console.log(response.data.data.translation);
       setContent(response.data.data.translation);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsTranslating(false);
     }
   };
 
   const handleLanguage = () => {
-    console.log("clicked");
     setShowTranslationModal(!false);
   };
 
-  const handleTranslationModalSetting = (conversationId, from, to) => {
-    console.log("clicked");
-    console.log(`conversationId ${conversationId} - from ${from} - to ${to}`);
+  const handleTranslationModalSetting = ({
+    conversationId,
+    from,
+    to,
+  }: {
+    conversationId: string;
+    from: string;
+    to: string;
+  }) => {
     setShowTranslationModal(false);
     dispatch(setTranslationSetting({ conversationId, from, to }));
   };
 
+  if (!currConversation) {
+    return (
+      <div className="div flex justify-center items-center font-semibold text-[2rem] text-[var(--search)]">
+        Please select a conversation to start chatting
+      </div>
+    );
+  }
   return (
     <div className="chat">
       {showTranslationModal && (
         <TranslationSettingModal handleClick={handleTranslationModalSetting} />
       )}
       {showConversationSetting && (
-      <div className="conversation-setting">
+        <div className="conversation-setting">
           <ModalWrapper>
             <ModalOption icon={UserPen} option={"Profile"} />
             <ModalOption icon={Eraser} option={"Clear Chat"} />
@@ -197,12 +221,12 @@ export const Chat = ({handleCurrConversation}: {handleCurrConversation: () => vo
               option={"Language Settings"}
             />
             <ModalOption
-              handleClick={handleTranslationModal}
+              handleClick={() => console.log("Block Friend")}
               icon={ShieldBan}
               option={"Block Friend"}
             />
             <ModalOption
-              handleClick={handleTranslationModal}
+              handleClick={() => console.log("Delete Conversation")}
               icon={Trash2}
               option={"Delete Conversation"}
               className="danger"
@@ -214,14 +238,16 @@ export const Chat = ({handleCurrConversation}: {handleCurrConversation: () => vo
         <button onClick={handleCurrConversation}>
           <ArrowLeft size={30} color="#ffffff" strokeWidth={1.5} />
         </button>
-        <ConversationImage />
+        <ConversationImage frndImg={frndImg} />
         <div className="chat-info">
           <div className="conversation-title">
             <ConversationTitle name={frndName} />
           </div>
           <div className="chat-status">Online</div>
         </div>
-        <button onClick={e => setShowConversationSetting(!showConversationSetting)}>
+        <button
+          onClick={() => setShowConversationSetting(!showConversationSetting)}
+        >
           <KebabMenu />
         </button>
       </div>
@@ -245,27 +271,48 @@ export const Chat = ({handleCurrConversation}: {handleCurrConversation: () => vo
               setContent(e.target.value);
             }}
           />
-          <Sparkles
-            color="#AAAAAA"
-            strokeWidth={1.5}
-            cursor="pointer"
-            onClick={e => setShowAI(!showAI)}
-          />
+          <div className="ai">
+            {" "}
+            {isTranslating ? (
+              <div className="isLoading">
+                <Loader size={20} />
+              </div>
+            ) : (
+              <Sparkles
+                color="#AAAAAA"
+                strokeWidth={1.5}
+                cursor="pointer"
+                onClick={() => setShowAI(!showAI)}
+              />
+            )}
+          </div>
         </div>
         <button className="send-btn" onClick={() => handleSend(content)}>
-          <SendHorizontal className="send-btn-icon"  size={30} strokeWidth={2} />
+          {isLoading ? (
+            <div className="isLoading">
+              <Loader size={20} />
+            </div>
+          ) : (
+            <SendHorizontal
+              className="send-btn-icon"
+              size={30}
+              strokeWidth={2}
+            />
+          )}
         </button>
       </div>
-      {showAI && <div className="AI-modal">
-        <ModalWrapper>
-          <ModalOption
-            handleClick={handleTranslationModal}
-            icon={Languages}
-            option={"Translate"}
-          />
-          <ModalOption icon={LetterText} option={"Format"} />
-        </ModalWrapper>
-      </div>}
+      {showAI && (
+        <div className="AI-modal">
+          <ModalWrapper>
+            <ModalOption
+              handleClick={handleInputTranslate}
+              icon={Languages}
+              option={"Translate"}
+            />
+            <ModalOption icon={LetterText} option={"Format"} />
+          </ModalWrapper>
+        </div>
+      )}
     </div>
   );
 };

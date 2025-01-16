@@ -10,22 +10,41 @@ export const createMessage: RequestHandler = async (req, res) => {
   if (!content || !conversationId) {
     throw new CustomError(400, "content and conversationId are required");
   }
+  const [newMessage, updatedConversation] = await prisma.$transaction([
+    prisma.message.create({
+      data: {
+        content,
+        sender: {
+          connect: {
+            id: senderId,
+          },
+        },
+        conversation: {
+          connect: {
+            id: conversationId,
+          },
+        },
+      },
+    }),
 
-  const newMessage = await prisma.message.create({
-    data: {
-      content,
-      sender: {
-        connect: {
-          id: senderId,
+    prisma.conversation.update({
+      where: {
+        id: conversationId,
+      },
+      data: {
+        lastMessageContent: content,
+        lastMessageSenderId: senderId,
+        lastMessageTime: new Date(),
+      },
+      include: {
+        members: {
+          select: {
+            user: true,
+          },
         },
       },
-      conversation: {
-        connect: {
-          id: conversationId,
-        },
-      },
-    },
-  });
+    }),
+  ]);
 
   if (!newMessage) {
     throw new CustomError(500, "Failed to create message");
@@ -34,7 +53,7 @@ export const createMessage: RequestHandler = async (req, res) => {
   res.status(201).json({
     status: "success",
     message: "Message sent",
-    data: { newMessage },
+    data: { newMessage, updatedConversation },
   });
 };
 
@@ -64,8 +83,8 @@ export const getAllMessages: RequestHandler = async (req, res) => {
     throw new CustomError(404, "No messages found");
   }
 
-  res.status(200).json({ 
+  res.status(200).json({
     status: "success",
     data: { messages },
-   });
+  });
 };

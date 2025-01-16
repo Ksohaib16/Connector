@@ -2,7 +2,8 @@ export const Loader = ({ size }: { size?: number }) => {
   return (
     <div className="flex items-center justify-center">
       <svg
-        className={`animate-spin h-${size} w-${size}`}
+        className={`animate-spin text-white`}
+        style={{height: `${size}px`, width: `${size}px`}}
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
       >

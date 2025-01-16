@@ -2,15 +2,30 @@
   display: flex;
   height: 100vh;
   flex-direction: column;
-  border-right: 0.5px solid var(--text-secondary);
+  border-right: 0.5px solid var(--text-secondary);  
 }
 
 .profile-modal{
   position: relative;
-  top: -62%;        /* Change these values */
-  left: 55%;       /* to position anywhere */
+  top: -62%;
+  left: 55%;
   transform: translate(-50%, -50%);
-  z-index: 1000;   /* Make sure modal stays on top */
+  z-index: 1000;
   border-radius: 10px;
+}
+
+
+.conversations {
+  flex: 1;
+  overflow: auto;
+  padding: 0 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.isLoading{
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 

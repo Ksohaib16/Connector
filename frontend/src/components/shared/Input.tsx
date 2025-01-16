@@ -39,6 +39,8 @@ export const Input = ({
           ${error ? "border-[#E53935]" : "border-[#5b5b5ad9]"}
           placeholder:text-[0.75rem]
           ${Icon ? 'pr-[-.75rem]' : ''}
+          hover:border-[var(--primary)]
+          hover:border-[1px]
         `}
       />
       {Icon && (
