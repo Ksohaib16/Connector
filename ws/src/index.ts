@@ -1,5 +1,5 @@
 import WebSocket, { WebSocketServer } from "ws";
-const wss = new WebSocketServer({ port: Number(process.env.PORT ) || 8080 });
+const wss = new WebSocketServer({ port: Number(process.env.PORT ) });
 
 let users = new Map<string, WebSocket>();
 
@@ -31,7 +31,7 @@ wss.on("connection", (ws: WebSocket) => {
 
   ws.on("close", () => {
     console.log("Client disconnected");
-    let userIdRemove = null;
+    let userIdRemove: string | null = null;
     for (const [userId, value] of users.entries()) {
       if (value === ws) {
         userIdRemove = userId;
