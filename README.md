@@ -88,15 +88,15 @@ To run this project, you will need to add the following environment variables to
 
 ### Frontend
 
-VITE_API_URL=http://localhost:Backned-port
-VITE_WS_URL=ws://localhost:Websocket-port
+-   **VITE_API_URL**=http://localhost:Backned-port
+-   **VITE_WS_URL**=ws://localhost:Websocket-port
 
 ### Backend
 
-DATABASE_URL= "Postgres Connection String"
-OPENROUTER_API_KEY= "Your Openrouter Api key"
-FIREBASE_KEY= "Your firebase private key"
+-   **DATABASE_URL**= "Postgres Connection String"
+-   **OPENROUTER_API_KEY**= "Your Openrouter Api key"
+-   **FIREBASE_KEY**= "Your firebase private key"
 
 ### WebSocket
 
-PORT=port
+-   **PORT**=port
