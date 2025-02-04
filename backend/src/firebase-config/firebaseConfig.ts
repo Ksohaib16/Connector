@@ -1,13 +1,12 @@
 import admin from 'firebase-admin';
 import { Request, Response, NextFunction } from 'express';
 
-// Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert({
-            projectId: 'connector-10d1a', // Replace with your actual project ID
-            clientEmail: 'firebase-adminsdk-rkwua@connector-10d1a.iam.gserviceaccount.com', // Replace with the client_email from the JSON
-            privateKey: process.env.FIREBASE_KEY, // Replace with private_key from the JSON
+            projectId: 'connector-10d1a',
+            clientEmail: 'firebase-adminsdk-rkwua@connector-10d1a.iam.gserviceaccount.com',
+            privateKey: process.env.FIREBASE_KEY,
         }),
     });
 }

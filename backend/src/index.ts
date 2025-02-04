@@ -6,7 +6,7 @@ import cors from 'cors';
 
 const app = express();
 
-// CORS configuration
+// CORS
 app.use(
     cors({
         origin: [
@@ -22,7 +22,6 @@ app.use(express.json());
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-// Add request timeout
 const timeout = 30000;
 app.use((req, res, next) => {
     req.setTimeout(timeout);
