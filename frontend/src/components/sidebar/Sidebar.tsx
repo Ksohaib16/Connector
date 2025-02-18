@@ -23,6 +23,7 @@ import { RootState } from '../../redux/store';
 import { Conversation } from './conversations/Conversation';
 import { Loader } from '../loader/Loader';
 import { config } from '../../config/api.config';
+import { set } from 'date-fns';
 
 export const Sidebar = () => {
     const navigate = useNavigate();
@@ -77,6 +78,8 @@ export const Sidebar = () => {
     const handleSearch = async (search: string) => {
         try {
             const token = await auth.currentUser?.getIdToken();
+
+            if (!search) return;
 
             const response = await axios.post(
                 `${config.API_URL}/api/v1/user/friend`,
@@ -140,7 +143,12 @@ export const Sidebar = () => {
     return (
         <div className="sidebar">
             <div className="navbar">
-                <div className="menu-btn" onClick={() => setShowProfileModal(!showProfileModal)}>
+                <div
+                    className="menu-btn"
+                    onClick={() => {
+                        setShowProfileModal(!showProfileModal);
+                    }}
+                >
                     <Menu
                         style={{ cursor: 'pointer' }}
                         color="#AAAAAA"

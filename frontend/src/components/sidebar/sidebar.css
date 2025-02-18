@@ -1,31 +1,29 @@
 .sidebar {
-  display: flex;
-  height: 100vh;
-  flex-direction: column;
-  border-right: 0.5px solid var(--text-secondary);  
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    border-right: 0.5px solid var(--text-secondary);
 }
 
-.profile-modal{
-  position: relative;
-  top: -62%;
-  left: 55%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  border-radius: 10px;
+.profile-modal {
+    position: relative;
+    top: -56%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    border-radius: 10px;
 }
-
 
 .conversations {
-  flex: 1;
-  overflow: auto;
-  padding: 0 0.75rem;
-  margin-top: 0.5rem;
+    flex: 1;
+    overflow: auto;
+    padding: 0 0.75rem;
+    margin-top: 0.5rem;
 }
 
-.isLoading{
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.isLoading {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-

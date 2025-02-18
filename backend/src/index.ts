@@ -29,6 +29,10 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get('/api/v1/test', (req, res) => {
+    res.send('Server is running');
+});
+
 app.use('/api/v1', rootRouter);
 
 app.all('*', (req: Request, res: Response) => {
@@ -40,6 +44,6 @@ app.all('*', (req: Request, res: Response) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, '0.0.0.0', (): void => {
+app.listen(PORT, (): void => {
     console.log(`Server is running on port ${PORT}`);
 });
