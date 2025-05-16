@@ -7,16 +7,7 @@ import cors from 'cors';
 const app = express();
 
 // CORS
-app.use(
-    cors({
-        origin: [
-            'https://connector-five.vercel.app',
-            'https://connector-sohaibs-projects-1c7baf9c.vercel.app',
-            'http://localhost:5173',
-        ],
-        credentials: true,
-    }),
-);
+app.use(cors());
 
 app.use(express.json());
 
