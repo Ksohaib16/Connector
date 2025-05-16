@@ -87,6 +87,7 @@ export const Sidebar = () => {
                     email: search,
                 },
                 {
+                    
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

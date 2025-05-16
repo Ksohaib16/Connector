@@ -1,12 +1,12 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCauMN0SP_zwOWHxFxEQc5haH31SOQMPzw",
-    authDomain: "connector-10d1a.firebaseapp.com",
-    projectId: "connector-10d1a",
-    storageBucket: "connector-10d1a.firebasestorage.app",
-    messagingSenderId: "107918408357",
-    appId: "1:107918408357:web:dfae13cc8b4b695c072b4c"
-  };
-
-  export const app = initializeApp(firebaseConfig);
+    apiKey: 'AIzaSyBJrT1dw6qc3ADZIaVs-eHsHtzKLaDRMX0',
+    authDomain: 'connector-56f41.firebaseapp.com',
+    projectId: 'connector-56f41',
+    storageBucket: 'connector-56f41.firebasestorage.app',
+    messagingSenderId: '430409194225',
+    appId: '1:430409194225:web:7f0e24529261324f466750',
+};
+console.log(firebaseConfig.apiKey, 'Firebase API Key');
+export const app = initializeApp(firebaseConfig);
