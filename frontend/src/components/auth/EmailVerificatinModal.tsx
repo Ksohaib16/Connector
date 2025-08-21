@@ -2,7 +2,7 @@ import "./EmailVerificationModal.css"
 
 export const EmailVerificationModal = ({email, onClose}: {email: string, onClose?: () => void}) => {
     return (
-      <div className="email-verification-modal" onClick={onClose}>
+      <div className="email-verification-modal fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
         <div className="email-modal-background absolute"></div>
         <div className="email-modal-card " onClick={(e) => e.stopPropagation()}>
             <img src="/no-email.png" alt=""  />
