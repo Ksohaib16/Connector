@@ -58,71 +58,9 @@ Translation engine will:
   `;
 };
 
-// Temporary fallback translation for testing
-const fallbackTranslation = (text: string, from: string, to: string) => {
-  const translations: { [key: string]: { [key: string]: string } } = {
-    'English': {
-      'Spanish': 'Hola, ¿cómo estás?',
-      'Hinglish': 'Namaste, kaise ho aap?',
-      'Marathi': 'नमस्कार, तुम्ही कसे आहात?',
-      'Kannada': 'ನಮಸ್ಕಾರ, ನೀವು ಹೇಗಿದ್ದೀರಿ?'
-    },
-    'Spanish': {
-      'English': 'Hello, how are you?',
-      'Hinglish': 'Namaste, kaise ho aap?',
-      'Marathi': 'नमस्कार, तुम्ही कसे आहात?',
-      'Kannada': 'ನಮಸ್ಕಾರ, ನೀವು ಹೇಗಿದ್ದೀರಿ?'
-    },
-    'Hinglish': {
-      'English': 'Hello, how are you?',
-      'Spanish': 'Hola, ¿cómo estás?',
-      'Marathi': 'नमस्कार, तुम्ही कसे आहात?',
-      'Kannada': 'ನಮಸ್ಕಾರ, ನೀವು ಹೇಗಿದ್ದೀರಿ?'
-    },
-    'Marathi': {
-      'English': 'Hello, how are you?',
-      'Spanish': 'Hola, ¿cómo estás?',
-      'Hinglish': 'Namaste, kaise ho aap?',
-      'Kannada': 'ನಮಸ್ಕಾರ, ನೀವು ಹೇಗಿದ್ದೀರಿ?'
-    },
-    'Kannada': {
-      'English': 'Hello, how are you?',
-      'Spanish': 'Hola, ¿cómo estás?',
-      'Hinglish': 'Namaste, kaise ho aap?',
-      'Marathi': 'नमस्कार, तुम्ही कसे आहात?'
-    }
-  };
-
-  if (from === to) {
-    return text; // No translation needed
-  }
-
-  const fallback = translations[from]?.[to];
-  if (fallback) {
-    return `[Fallback Translation] ${fallback}`;
-  }
-
-  return `[Fallback Translation] ${text} (${from} → ${to})`;
-};
 
 const translateText = async (text: string, options: TranslateOptions) => {
   const { from, to } = options;
-
-  // Check for required environment variables
-  if (!process.env.OPENROUTER_API_KEY) {
-    console.log('OpenRouter API key not found, using fallback translation');
-    return fallbackTranslation(text, from, to);
-  }
-
-  if (!process.env.YOUR_SITE_URL) {
-    console.log('Site URL not configured, using fallback translation');
-    return fallbackTranslation(text, from, to);
-  }
-
-  if (!process.env.YOUR_APP_NAME) {
-    console.log('App name not configured, using fallback translation');
-    return fallbackTranslation(text, from, to);
-  }
 
   try {
     console.log('Making translation request to OpenRouter with:', {
