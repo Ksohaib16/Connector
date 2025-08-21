@@ -1,127 +1,139 @@
-import axios from 'axios';
-import { Mail, Lock } from 'lucide-react';
-import { AuthHeader } from '../components/AuthHeader';
-import { AuthForm } from '../components/AuthForm';
-import { AuthWrapper } from '../components/wrapper/AuthWrapper';
-import { useState } from 'react';
-import { validateLoginForm } from '../utility/validateForm';
-import { app } from '../config/Firebase';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/userSlice';
-import { Link, useNavigate } from 'react-router-dom';
-import { MainWrapper } from '../components/wrapper/MainWrapper';
-import { ContentWrapper } from '../components/wrapper/ContentWrapper';
-import { config } from '../config/api.config';
+import axios from "axios";
+import { Mail, Lock } from "lucide-react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { toast } from "react-hot-toast";
+
+import { AuthHeader } from "../components/AuthHeader";
+import { AuthForm } from "../components/AuthForm";
+import { validateLoginForm } from "../utility/validateForm";
+import { setUser } from "../redux/userSlice";
+import { config } from "../config/api.config";
+import { app } from "../config/Firebase";
 
 const auth = getAuth(app);
 
 const authDetails = {
-    heading: 'Connector',
-    subHeading: 'Please confirm you email and password',
+  heading: "Connector",
+  subHeading: "Please confirm your email and password",
 };
 
 const inputDetails = [
-    { type: 'text', placeholder: 'Email', name: 'email', icon: Mail },
-    { type: 'password', placeholder: 'Password', name: 'password', icon: Lock },
+  { type: "email", placeholder: "Email", name: "email", icon: Mail },
+  { type: "password", placeholder: "Password", name: "password", icon: Lock },
 ];
 
 interface FormErrors {
-    [key: string]: string;
+  [key: string]: string;
 }
 
-//function
+/* ------------------------------------------------------------------ */
+/* Re-usable compact glass card                                       */
+/* ------------------------------------------------------------------ */
+const GlassCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl shadow-black/20 p-5 sm:p-6 space-y-4">
+    {children}
+  </div>
+);
+
+/* ------------------------------------------------------------------ */
+/* Login page                                                         */
+/* ------------------------------------------------------------------ */
 export const Login = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [errors, setErrors] = useState<FormErrors>({});
-    const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData((currData) => {
-            return { ...currData, [e.target.name]: e.target.value };
-        });
-        setErrors({});
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setErrors({});
+  };
 
-    const loginUser = async (email: string) => {
-        const user = auth.currentUser;
-        const token = await user?.getIdToken();
-
-        const response = await axios.post(
-            `${config.API_URL}/api/v1/auth/login`,
-            {
-                email,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            },
-        );
-        const userData = response.data;
-        setFormData({
-            email: '',
-            password: '',
-        });
-        return userData;
-    };
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const newErrors = validateLoginForm(formData);
-        console.log('newError', newErrors);
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length === 0) {
-            try {
-                setIsLoggingIn(true);
-                await signInWithEmailAndPassword(auth, formData.email, formData.password);
-
-                const userData = await loginUser(formData.email);
-                if (!userData) {
-                    return;
-                }
-                console.log(userData, userData.status);
-                dispatch(setUser(userData.data.user));
-                navigate('/home');
-            } catch {
-                setErrors((prev) => ({
-                    ...prev,
-                    password: 'Invalid email or password',
-                }));
-            } finally {
-                setIsLoggingIn(false);
-            }
-        }
-    };
-
-    return (
-        <MainWrapper>
-            <ContentWrapper>
-                <AuthWrapper>
-                    <AuthHeader heading={authDetails.heading} subHeading={authDetails.subHeading} />
-                    <AuthForm
-                        errors={errors}
-                        handleSubmit={handleSubmit}
-                        handleChange={handleChange}
-                        values={formData}
-                        inputDetails={inputDetails}
-                        button={'LOG IN'}
-                        isLoggin={isLoggingIn}
-                    />
-                    <div className="text-[#AAAAAA]">
-                        Don't have an account? &nbsp;{' '}
-                        <b className="text-[#3874c9]">
-                            <Link to="/signup">Sign up</Link>
-                        </b>
-                    </div>
-                </AuthWrapper>
-            </ContentWrapper>
-        </MainWrapper>
+  const loginUser = async (email: string) => {
+    const token = await auth.currentUser?.getIdToken();
+    const { data } = await axios.post(
+      `${config.API_URL}/api/v1/auth/login`,
+      { email },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
+    return data;
+  };
+
+  const setPresenceOnline = async () => {
+    const token = await auth.currentUser?.getIdToken();
+    try {
+      await axios.post(
+        `${config.API_URL}/api/v1/presence`,
+        { status: 'ONLINE' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (e) {
+      // non-blocking
+      console.warn('Failed to set presence ONLINE');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const newErrors = validateLoginForm(formData);
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length) {
+      toast.error(Object.values(newErrors)[0]);
+      return;
+    }
+
+    try {
+      setIsLoggingIn(true);
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const userData = await loginUser(formData.email);
+      dispatch(setUser(userData.data.user));
+      await setPresenceOnline();
+      toast.success("Welcome back!");
+      navigate("/home");
+    } catch {
+      toast.error("Invalid email or password");
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+      <GlassCard>
+        <AuthHeader
+          heading={authDetails.heading}
+          subHeading={authDetails.subHeading}
+        />
+        <p className="-mt-2 text-sm text-gray-400 text-center">
+          Log in to continue your conversations
+        </p>
+
+        <AuthForm
+          errors={errors}
+          handleSubmit={handleSubmit}
+          handleChange={handleChange}
+          values={formData}
+          inputDetails={inputDetails}
+          button="Log In"
+          isLoggin={isLoggingIn}
+        />
+
+        <p className="text-center text-sm text-gray-400">
+          Don’t have an account?{" "}
+          <Link
+            to="/signup"
+            className="font-semibold text-[#3874c9] hover:text-[#2e61a6] transition"
+          >
+            Sign up
+          </Link>
+        </p>
+      </GlassCard>
+    </main>
+  );
 };

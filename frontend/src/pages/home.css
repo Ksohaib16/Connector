@@ -1,10 +1,10 @@
-.home-container {
+/* .home-container {
     display: grid;
-    grid-template-columns: 1fr;  /* Mobile default: single column */
+    grid-template-columns: 1fr;
   }
-  
+
   @media (min-width: 768px) {
     .home-container {
-      grid-template-columns: 1fr 2fr;  /* Desktop: 1:2 ratio */
+      grid-template-columns: 1fr 2fr;
     }
-  }
+  } */

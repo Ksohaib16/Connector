@@ -1,75 +1,108 @@
 import { useState } from "react";
-import "./TranslationSettingModal.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { X } from "lucide-react";
+
+interface ConversationShape {
+  id: string;
+  members: Array<{ user: { id: string; username?: string; avatarUrl?: string } }>;
+}
+
 export const TranslationSettingModal = ({
   handleClick,
+  onClose,
 }: {
-  handleClick: ({ conversationId, from, to }: { 
-    conversationId: string, 
-    from: string, 
-    to: string 
+  handleClick: (payload: {
+    conversationId: string;
+    from: string;
+    to: string;
   }) => void;
+  onClose?: () => void;
 }) => {
-  const [from, setFrom] = useState("Auto-Detect");
+  const [from, setFrom] = useState("English");
   const [to, setTo] = useState("English");
-  const conversationId = useSelector(
-    (state: RootState) => state.conversation.currConversation?.id
+
+  const currConversation = useSelector(
+    (state: RootState) => state.conversation.currConversation as ConversationShape | null
   );
 
-  const handleFrom = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFrom(e.target.value);
+  const handleSave = () => {
+    if (currConversation?.id) {
+      handleClick({ conversationId: currConversation.id, from, to });
+      onClose?.();
+    }
   };
 
-  const handleTo = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTo(e.target.value);
-  };
+  const languages = ["English", "Spanish", "Hinglish", "Marathi", "Kannada"];
 
   return (
-    <div className="translation-verification-modal">
-      <div className="translation-modal-background "></div>
-      <div className="translation-modal-card ">
-        <h3 className="heading text-[1.4rem] font-medium pb-[1rem] text-[white]">
-          Translation Setting
-        </h3>
-        <div className="options from">
-          <div className="select">
-            <label htmlFor="from">From:</label>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-slate-800 rounded-xl shadow-2xl w-full max-w-sm mx-4 p-6 space-y-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-white">Translation Setting</h3>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-slate-700 transition"
+          >
+            <X size={20} className="text-gray-400" />
+          </button>
+        </div>
+
+        {/* Selects */}
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="from" className="block text-sm font-medium text-gray-300 mb-1">
+              From
+            </label>
             <select
-              name="from"
               id="from"
-              className="select"
               value={from}
-              onChange={handleFrom}
+              onChange={(e) => setFrom(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="Auto-Detect">Auto-Detect</option>
-              <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="Hinglish">Hinglish</option>
-              <option value="Marathi">Marathi</option>
-              <option value="Kannada">Kannada</option>
+              {languages.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
             </select>
           </div>
-          <div className="select to">
-            <label htmlFor="to">To:</label>
+
+          <div>
+            <label htmlFor="to" className="block text-sm font-medium text-gray-300 mb-1">
+              To
+            </label>
             <select
-              name="from"
               id="to"
-              className="select"
               value={to}
-              onChange={handleTo}
+              onChange={(e) => setTo(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="Hinglish">Hinglish</option>
-              <option value="Marathi">Marathi</option>
-              <option value="Kannada">Kannada</option>
+              {languages.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
             </select>
           </div>
         </div>
-        <button onClick={() => handleClick({conversationId, from, to})}>
-          Save Changes
-        </button>
+
+        {/* Actions */}
+        <div className="flex justify-end">
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-medium transition"
+          >
+            Save Changes
+          </button>
+        </div>
       </div>
     </div>
   );

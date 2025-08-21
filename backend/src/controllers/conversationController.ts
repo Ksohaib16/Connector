@@ -39,25 +39,22 @@ export const createConversationAndMember: RequestHandler = WrapAsync(async (req,
     const { id, email } = req.body;
 
     if (!id || !email) {
-        throw new CustomError(400, 'Email is required');
+        throw new CustomError(400, 'Email and id are required');
     }
 
-    const currUserId = req.user?.uid;
     const currUserEmail = req.user?.email;
 
     if (email === currUserEmail) {
         throw new CustomError(400, "You can't add yourself as a friend");
     }
 
+    // Check if conversation already exists between these two users
     const existingConversation = await prisma.conversation.findFirst({
         where: {
-            members: {
-                every: {
-                    userId: {
-                        in: [currUserId, id],
-                    },
-                },
-            },
+            AND: [
+                { members: { some: { user: { email: currUserEmail } } } },
+                { members: { some: { user: { email } } } },
+            ],
         },
     });
 
@@ -71,15 +68,22 @@ export const createConversationAndMember: RequestHandler = WrapAsync(async (req,
                 create: [
                     {
                         user: {
-                            connect: { id: currUserId },
+                            connect: { email: currUserEmail },
                         },
                     },
                     {
                         user: {
-                            connect: { id },
+                            connect: { email },
                         },
                     },
                 ],
+            },
+        },
+        include: {
+            members: {
+                select: {
+                    user: true,
+                },
             },
         },
     });
@@ -97,12 +101,14 @@ export const createConversationAndMember: RequestHandler = WrapAsync(async (req,
 });
 
 export const getAllConversation: RequestHandler = WrapAsync(async (req, res) => {
-    const currUser = req.user;
+    const currUserEmail = req.user?.email;
     const userConversation = await prisma.conversation.findMany({
         where: {
             members: {
                 some: {
-                    userId: currUser?.uid,
+                    user: {
+                        email: currUserEmail,
+                    },
                 },
             },
         },

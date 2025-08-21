@@ -38,10 +38,10 @@ export const conversationSlice = createSlice({
     },
 
     addNotification: (state, action) => {
-      const {conversatinId, count} = action.payload;
+      const {conversationId, count} = action.payload;
       state.notificationCount = {
         ...state.notificationCount,
-        [conversatinId]: count
+        [conversationId]: count
       }
     },
 
