@@ -188,7 +188,12 @@ export const Signup = () => {
           </Link>
         </p>
 
-        {showModal && <EmailVerificationModal email={formData.email} />}
+        {showModal && (
+          <EmailVerificationModal
+            email={formData.email}
+            onClose={() => setShowModal(false)}
+          />
+        )}
       </GlassCard>
     </main>
   );
